@@ -1,12 +1,15 @@
-# How to Get Started
+# Let's Hangout
+A hangout planner to bring college students together.
 
-## Clone the Repo to Your Local Computer
+## How to Get Started
+
+### Clone the Repo to Your Local Computer
 
 `git clone https://github.com/SPerrott22/lets-hangout.git`
 
 The React stuff is in the front-end folder while the backend stuff is in the api folder.
 
-## How to Turn on the App
+### How to Turn on the App
 
 `docker-compose up`
 
@@ -35,8 +38,10 @@ Note: you may experience some difficulties on a Windows machine. Try removing th
       - /app/node_modules
 ```
 
-## Final Remarks
+### Final Remarks
 
 Yay, now please go ahead and implement what you want, do it on your local machine. If the Docker volumes are working, it should update real-time as you make changes.
 
 When you've made changes, please commit them back to the GitHub repo. We can have two branches, one for front-end, one for backend.
+
+&copy; 2023 by Joshua Zhu, Joshua Li, Samuel Perrott, Matthew Toutounjian, Andrew Liang.
