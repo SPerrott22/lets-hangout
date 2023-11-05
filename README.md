@@ -2,6 +2,7 @@
 A hangout planner to bring college students together.
 
 ## How to Get Started
+Prerequisites: install git, docker, and docker-compose. You should also have node, npm, python3, etc.
 
 ### Clone the Repo to Your Local Computer
 
