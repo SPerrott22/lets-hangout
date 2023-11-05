@@ -2,6 +2,7 @@
 A hangout planner to bring college students together.
 
 ## How to Get Started
+Prerequisites: install git, docker, and docker-compose. You should also have node, npm, python3, etc.
 
 ### Clone the Repo to Your Local Computer
 
@@ -15,7 +16,7 @@ The React stuff is in the front-end folder while the backend stuff is in the api
 
 Open the frontend at http://localhost:5173
 
-Open the backend at https://localhost:4000
+Open the backend at http://localhost:4000
 
 Access the PostgreSQL at port 5432 on Host 127.0.0.1
 Username, Password, and DB name are all "postgres"
@@ -43,5 +44,18 @@ Note: you may experience some difficulties on a Windows machine. Try removing th
 Yay, now please go ahead and implement what you want, do it on your local machine. If the Docker volumes are working, it should update real-time as you make changes.
 
 When you've made changes, please commit them back to the GitHub repo. We can have two branches, one for front-end, one for backend.
+
+**Sources**
+* https://www.youtube.com/watch?v=fHQWTsWqBdE
+* https://github.com/tko22/flask-boilerplate
+* https://flask.palletsprojects.com/en/3.0.x/quickstart/
+* https://www.digitalocean.com/community/tutorials/how-to-create-your-first-web-application-using-flask-and-python-3
+* https://dev.to/nagatodev/getting-started-with-flask-1kn1
+* https://towardsdatascience.com/build-deploy-a-react-flask-app-47a89a5d17d9
+* https://dev.to/nagatodev/building-a-todo-list-application-with-flask-fcj
+* https://github.com/uclaacm/hothX-workshops/tree/main/intro-to-servers
+* https://www.youtube.com/watch?v=31ieHmcTUOk&list=PL4cUxeGkcC9hxjeEtdHFNYMtCpjNBm3h7
+* https://github.com/FrancescoXX/flask-crud-live/blob/main/app.py
+* https://github.com/uclaacm/hackschool-f23/blob/main/Session-2/src/App.jsx
 
 &copy; 2023 by Joshua Zhu, Joshua Li, Samuel Perrott, Matthew Toutounjian, Andrew Liang.
