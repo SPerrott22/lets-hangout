@@ -21,6 +21,10 @@ class User(db.Model):
 
 db.create_all() # initializes db
 
+@app.route('/')
+def index():
+    return 'Hello There. Welcome to the CSS-less backend server. Try doing stuff with my subpages using Postman ;)'
+
 #create a test route
 @app.route('/test', methods=['GET'])
 def test():
