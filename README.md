@@ -2,7 +2,9 @@
 A hangout planner to bring college students together.
 
 ## How to Get Started
-Prerequisites: install git, docker, and docker-compose. You should also have node, npm, python3, etc.
+Prerequisites: install git, docker, and docker-compose.
+
+You should also have node, npm, python3, etc. Also, make sure your computer is connected to your GitHub. This part can be annoying.
 
 ### Clone the Repo to Your Local Computer
 
@@ -114,6 +116,16 @@ git restore FILENAME # if you want to discard any uncommitted changes to it
 # regarding pull-requests: you do that in GitHub on a browser.
 # further research: rebasing.
 ```
+
+## TO-DO
+1) meet up to talk about stuff
+2) a Figma mockup and somebody to start making the front-end.
+3) the backend peeps to add a Google Calendar integration and OpenAI ChatGPT integration or fetching or something. And figure out what our input/ouput is going to be.
+4) figure out our persistent database for storing users information.
+
+### Links: (accessible only to collaborators)
+[Official Schedule](https://docs.google.com/document/d/18CVAa7x0p81EIlmhSwevdX1e9p91VaN9H7_z0aK3GY4/edit?usp=sharing)
+[Project Proposal](https://docs.google.com/document/d/1pcBcbz_itiW3kw4zLuwpz3pQPqzzmZLH82ii28W8zP0/edit#heading=h.ck9tcfup1nn4)
 
 **Sources**
 * https://www.youtube.com/watch?v=fHQWTsWqBdE
