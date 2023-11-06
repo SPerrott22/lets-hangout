@@ -19,6 +19,7 @@ Open the frontend at http://localhost:5173
 Open the backend at http://localhost:4000
 
 Access the PostgreSQL at port 5432 on Host 127.0.0.1
+
 Username, Password, and DB name are all "postgres"
 
 The docker-compose.yaml file essentially starts up three containers for the above three parts of our web app. These containers communicate via the above ports but are otherwise isolated from each other.
