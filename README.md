@@ -71,17 +71,17 @@ When you've made changes, please commit them to a separate branch on the GitHub 
 
 First time only:
 ```console
-cd ~/wherever/you/want/to/go/to/store/a/copy/of/stuff-to-work-on/
-git clone https://github.com/SPerrott22/lets-hangout.git
+$ cd ~/wherever/you/want/to/go/to/store/a/copy/of/stuff-to-work-on/
+$ git clone https://github.com/SPerrott22/lets-hangout.git
 ```
 (This automatically does the `git init` stuff, so don't worry about that, `git init` is just for like starting out on local.
 
 Everytime:
 ```console
-git fetch --all --prune # ensures you have latest branch information available, but it doeesn't affect local yet
-git branch # to list all local branches
-git switch existing-branch-name # if you want to create a new local branch, do git switch -c new-branch-name
-git pull origin branch-name # if you want to override your local with the remote stuff
+$ git fetch --all --prune # ensures you have latest branch information available, but it doeesn't affect local yet
+$ git branch # to list all local branches
+$ git switch existing-branch-name # if you want to create a new local branch, do git switch -c new-branch-name
+$ git pull origin branch-name # if you want to override your local with the remote stuff
 
 # do stuff like touching files, editing files, mkdir etc. so long as it's within your project folder where you did the clone
 
