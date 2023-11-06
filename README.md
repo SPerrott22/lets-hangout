@@ -83,38 +83,38 @@ $ git branch # to list all local branches
 $ git switch existing-branch-name # if you want to create a new local branch, do git switch -c new-branch-name
 $ git pull origin branch-name # if you want to override your local with the remote stuff
 
-# do stuff like touching files, editing files, mkdir etc. so long as it's within your project folder where you did the clone
+$ # do stuff like touching files, editing files, mkdir etc. so long as it's within your project folder where you did the clone
 
-git add -A # add all your new stuff to staging area
-git commit -m "Explain what you did."
-git push -u origin branch-name # push it to GitHub. You may have to set up SSH or HTTPS authentication, follow their tutorials.
-# -u just means in future if you do `git push` will be same as `git push origin feature-or-fix-branch` and `git pull` same as `git pull origin feature-or-fix-branch`
-
-
-# if you're just doing small bug fixes and want to make local branches but merge them back without dealing with GitHub
-
-# do stuff in your "testing" branch (you can use any name)
-git switch main # go back to main branch or whatever GitHub branch you're working on
-git merge testing # begin merge process
-git commit # finish it
-git branch -d testing # delete the local testing branch
+$ git add -A # add all your new stuff to staging area
+$ git commit -m "Explain what you did."
+$ git push -u origin branch-name # push it to GitHub. You may have to set up SSH or HTTPS authentication, follow their tutorials.
+$ # -u just means in future if you do `git push` will be same as `git push origin feature-or-fix-branch` and `git pull` same as `git pull origin feature-or-fix-branch`
 
 
-# other handy tools
-git branch -r # list remote branches
-git branch -a # list remote + local branches
-git diff
-git remote -v # view remote repos and their names
-git remote remove repo-nickname # if you don't want this repo
-git remote add repo-nickname https://github.com/linktorepo.git 
-git log
-git mv file_from file_to # renaming files
-git status
-git commit --amend # if you just made a message typo
-git restore FILENAME # if you want to discard any uncommitted changes to it
+$ # if you're just doing small bug fixes and want to make local branches but merge them back without dealing with GitHub
 
-# regarding pull-requests: you do that in GitHub on a browser.
-# further research: rebasing.
+$ # do stuff in your "testing" branch (you can use any name)
+$ git switch main # go back to main branch or whatever GitHub branch you're working on
+$ git merge testing # begin merge process
+$ git commit # finish it
+$ git branch -d testing # delete the local testing branch
+
+
+$ # other handy tools
+$ git branch -r # list remote branches
+$ git branch -a # list remote + local branches
+$ git diff
+$ git remote -v # view remote repos and their names
+$ git remote remove repo-nickname # if you don't want this repo
+$ git remote add repo-nickname https://github.com/linktorepo.git 
+$ git log
+$ git mv file_from file_to # renaming files
+$ git status
+$ git commit --amend # if you just made a message typo
+$ git restore FILENAME # if you want to discard any uncommitted changes to it
+
+$ # regarding pull-requests: you do that in GitHub on a browser.
+$ # further research: rebasing.
 ```
 
 ## TO-DO
