@@ -125,6 +125,7 @@ $ # further research: rebasing.
 
 ### Links: (accessible only to collaborators)
 [Official Schedule](https://docs.google.com/document/d/18CVAa7x0p81EIlmhSwevdX1e9p91VaN9H7_z0aK3GY4/edit?usp=sharing)
+
 [Project Proposal](https://docs.google.com/document/d/1pcBcbz_itiW3kw4zLuwpz3pQPqzzmZLH82ii28W8zP0/edit#heading=h.ck9tcfup1nn4)
 
 **Sources**
