@@ -119,9 +119,10 @@ $ # further research: rebasing.
 
 ## TO-DO
 1) meet up to talk about stuff
-2) a Figma mockup and somebody to start making the front-end.
+2) a Figma mockup and somebody to start making the front-end. Consider using Tailwind instead of SCSS
 3) the backend peeps to add a Google Calendar integration and OpenAI ChatGPT integration or fetching or something. And figure out what our input/ouput is going to be.
 4) figure out our persistent database for storing users information.
+5) potentially use [Vercel](https://vercel.com/) for free web hosting and [CockroachDB](https://www.cockroachlabs.com/blog/why-postgres/) for free persistent DB since it works well with PostgreSQL
 
 ### Links: (accessible only to collaborators)
 [Official Schedule](https://docs.google.com/document/d/18CVAa7x0p81EIlmhSwevdX1e9p91VaN9H7_z0aK3GY4/edit?usp=sharing)
