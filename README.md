@@ -6,6 +6,15 @@ Prerequisites: install git, docker, and docker-compose.
 
 You should also have node, npm, python3, etc. Also, make sure your computer is connected to your GitHub. This part can be annoying.
 
+Potential Issues for Windows Users:
+ - when setting up Docker, you may see the following error:
+       - `Listing WSL distros: running WSL command: wsl.exe -l -v --all`
+       - Windows Subsystem for Linux is required for Docker, to install WSL see https://learn.microsoft.com/en-us/windows/wsl/install
+ - after running wsl --install and restarting as according to the above, you may see the following error:
+       - `WslRegisterDistribution failed with error: 0x80370114`
+       - to fix this, in your Windows search bar, search for "Turn Windows features on or off"
+       - check the options "Virtual Machine Platform" and "Windows Subsystem for "Linux"
+
 ### Clone the Repo to Your Local Computer
 
 `git clone https://github.com/SPerrott22/lets-hangout.git`
@@ -14,11 +23,19 @@ The React stuff is in the front-end folder while the backend stuff is in the api
 
 ### How to Turn on the App
 
+Open Docker Desktop or whichever installation of Docker you're using
+
 `docker-compose up`
 
 Open the frontend at http://localhost:5173
 
 Open the backend at http://localhost:4000
+ - Pontential backend issue for Windows users:
+       - if the backend doesn't show at http://localhost:4000, look through the `docker-compose up` output for the following error:
+             - `api_c   | exec ./entrypoint.sh: no such file or directory`
+       - if you see this error, run `git diff HEAD` in your repository. if the output shows that there has been a `^M` character appended to every line of every file, then this is where the issue is stemming from
+       - you can run `git reset --hard` to reset the working files to the latest commit (note: if you have made any other changes to the working files, you will lose them)
+       - (tentative) git cloning and working exclusively under WSL may prevent this issue from happenining in the future
 
 Access the PostgreSQL at port 5432 on Host 127.0.0.1
 
