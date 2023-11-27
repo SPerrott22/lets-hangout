@@ -19,7 +19,7 @@ Potential Issues for Windows Users:
 
 `git clone https://github.com/SPerrott22/lets-hangout.git`
 
-The React stuff is in the front-end folder while the backend stuff is in the api folder.
+The React stuff is in the front-end folder while the backend stuff is in the api folder. (You may ignore the nginx folder as this is an optional utility we are currently not using.)
 
 ### How to Turn on the App
 
@@ -37,29 +37,42 @@ Open the backend at http://localhost:4000
        - you can run `git reset --hard` to reset the working files to the latest commit (note: if you have made any other changes to the working files, you will lose them)
        - (tentative) git cloning and working exclusively under WSL may prevent this issue from happenining in the future
 
-Access the PostgreSQL at port 5432 on Host 127.0.0.1
+The docker-compose.yaml file essentially starts up two containers for the above two parts of our web app. These containers communicate via the above ports but are otherwise isolated from each other.
 
-Username, Password, and DB name are all "postgres"
+The backend sends requests to a free-tier persistent cockroach db serverless PostgreSQL server that stores our user data. You can interact with it by sending JSON formatted HTTP requests to our backend server.
 
-The docker-compose.yaml file essentially starts up three containers for the above three parts of our web app. These containers communicate via the above ports but are otherwise isolated from each other.
+E.g. using Postman Agent you may put in a GET request to http://localhost:4000/users to see the current user data in our database.
 
-You can now make edits to all the files besides the docker-compose.yaml and it will make updates in real-time.
+Similarly, you can put in a POST request at http:/localhost:4000/users to create a new user:
+```JSON
+{
+ "username":"testuser",
+ "email":"silly@yahoo.com"
+}
+```
+
+Another cool feature is that you can make edits to all the files besides the docker-compose.yaml and it will make updates in real-time thanks to our volume configuration.
 
 To stop the containers temporarily
+
 `docker-compose stop`
 
 To restart them
+
 `docker-compose start`
 
 To turn off the app
+
 `docker-compose down`
 
 If you wish to remove all images and volumes you may do
+
 `docker-compose down --rmi all -v`
 
-Note: the `-v` flag will remove the pgdata volume. This means that the PostgreSQL data will be lost. We currently don't have a cloud PostgreSQL database manager yet, but I'm looking at elephantSQL or Amazon RDS free tiers as possiblilities. Until then, the way it is currently set up, every time you run `docker-compose up` you essentially run with an empty database. If you want to use pg_dump or write a script to prepopulate the database or incrementally share DB contents now and then (as opposed to real-time with the cloud db managers), feel free to write that code and push it to this branch. I don't think it's feasible to share the pgdata volume though. You could change it to a local ./pgdata directory but that can quickly become too much data to download locally and is not a good practice.
+WARNING: this can be bad if you've made edits to Dockerfiles, you'll lose an old image!
 
 If you need to install something for package.json for frontend, cd into front-end and then do `npm install X` for whatever you need to install. You'll have to then restart the docker stuff via:
+
 `docker-compose down -v`
 `docker-compose build --no-cache`
 `docker-compose up`
@@ -77,6 +90,8 @@ Note: you may experience some difficulties on a Windows machine. Try removing th
 ```
 
 The intention of this line was to create an anonymous volume to store the node_modules folder so that if you accidentally delete it on your local machine, the container will still have its own. Pro tip: don't delete it.
+
+For collaborators only: you can view the CockroachDB cluster called "lets-hangout" on your CockroachDB account. Here you may conveniently perform SQL queries and assess analytics.
 
 ### Final Remarks
 
@@ -136,10 +151,11 @@ $ # further research: rebasing.
 
 ## TO-DO
 1) meet up to talk about stuff
-2) a Figma mockup and somebody to start making the front-end. Consider using Tailwind instead of SCSS
-3) the backend peeps to add a Google Calendar integration and OpenAI ChatGPT integration or fetching or something. And figure out what our input/ouput is going to be.
-4) figure out our persistent database for storing users information.
-5) potentially use [Vercel](https://vercel.com/) for free web hosting and [CockroachDB](https://www.cockroachlabs.com/blog/why-postgres/) for free persistent DB since it works well with PostgreSQL
+2) now that the backend is persistent, it's time to configure our tables to store what we want and make a user authentication portal. Maybe Firebase SDK?
+3) a Figma mockup and somebody to start making the front-end. Consider using Tailwind instead of SCSS
+4) the backend peeps to add a Google Calendar integration and OpenAI ChatGPT integration or fetching or something. And figure out what our input/ouput is going to be.
+5) figure out our persistent database for storing users information.
+6) potentially use [Vercel](https://vercel.com/) for free web hosting and [CockroachDB](https://www.cockroachlabs.com/blog/why-postgres/) for free persistent DB since it works well with PostgreSQL
 
 ### Links: (accessible only to collaborators)
 [Official Schedule](https://docs.google.com/document/d/18CVAa7x0p81EIlmhSwevdX1e9p91VaN9H7_z0aK3GY4/edit?usp=sharing)
