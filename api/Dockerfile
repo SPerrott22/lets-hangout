@@ -1,8 +1,6 @@
-FROM python:3.6-slim-buster
+FROM python:3.8-slim-buster
 
-WORKDIR /app
-
-RUN apt-get update && apt-get install -y netcat && rm -rf /var/lib/lists/*
+RUN apt-get update && apt-get install -y netcat libpq-dev && rm -rf /var/lib/lists/*
 
 COPY requirements.txt ./
 
