@@ -109,3 +109,11 @@ def my_profile():
     }
 
     return response_body
+
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+  response_body = {
+    "token": "yahaha"
+  }
+
+  return make_response(jsonify(response_body), 200)

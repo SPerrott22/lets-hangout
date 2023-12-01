@@ -4,16 +4,19 @@ import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import About from '../pages/About';
 import Home from '../pages/Home';
+// import Dashboard from '../pages/Dashboard';
+import Login from '../pages/Login';
 import axios from "axios";
 import logo from '/vite.svg';
 import api from './api';
-import './App.css'
+import useToken from './useToken';
+import './App.css';
 
 function App() {
   // const [count, setCount] = useState(0)
 
-  const [profileData, setProfileData] = useState(null)
-  
+  const [profileData, setProfileData] = useState(null);
+  const { token, setToken } = useToken();
 
   function getData() {
     api({
@@ -32,6 +35,10 @@ function App() {
         console.log(error.response.headers)
         }
     })}
+
+    if (!token) {
+      return <Login setToken={setToken} />;
+    }
 
     return (
       <BrowserRouter>
@@ -63,6 +70,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            {/* <Route path="/dashboard" element={<Dashboard />} /> */}
           </Routes>
         <ul>
           <li>
