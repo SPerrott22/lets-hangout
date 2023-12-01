@@ -1,5 +1,6 @@
 import './Login.css';
 import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 async function loginUser(credentials) {
     return fetch('http://localhost:4000/login', {
@@ -13,6 +14,10 @@ async function loginUser(credentials) {
 }
 
 export default function Login({ setToken }) {
+    let navigate = useNavigate();
+    let location = useLocation();
+    let from = location.state?.from?.pathname || "/";
+
     const [username, setUserName] = useState();
     const [password, setPassword] = useState();
 
@@ -23,6 +28,7 @@ export default function Login({ setToken }) {
             password
         });
         setToken(token);
+        navigate(from, { replace: true });
     }
 
     return (
