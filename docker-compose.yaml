@@ -11,7 +11,7 @@ services:
   api:
     build: ./api
     container_name: api_c
-    image: kermitinbliss/flask_live_app:1.0.0
+    image: kermitinbliss/flask_live_app:2.0.0
     ports:
       - "4000:4000"
     volumes:
@@ -19,20 +19,62 @@ services:
     environment:
       - FLASK_APP=base.py
       - FLASK_ENV=development
-      - DB_URL=postgresql://postgres:postgres@flask_db:5432/postgres    
-    depends_on:
-      - flask_db
-  flask_db:
-    container_name: flask_db
-    image: postgres:12
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=postgres
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+      - DB_URL=cockroachdb://postgres:pXTM0ZtgPzlvitXhKMpxlg@lets-hangout-3925.g95.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&options=--cluster%3Dlets-hangout-3925
+    # depends_on:
+    #   - lb
 
-volumes:
-  pgdata: {}
+#   crdb-0:
+#     container_name: crdb-0
+#     hostname: crdb-0
+#     image: cockroachdb/cockroach:latest
+#     command: start --cluster-name=lets-hangout --logtostderr=WARNING --log-file-verbosity=WARNING --insecure --join=crdb-0 --advertise-addr=crdb-0
+#     volumes:
+#       - type: volume
+#         source: crdb-0
+#         target: /cockroach/cockroach-data
+
+
+#   crdb-1:
+#     container_name: crdb-1
+#     hostname: crdb-1
+#     image: cockroachdb/cockroach:latest
+#     command: start --cluster-name=lets-hangout --logtostderr=WARNING --log-file-verbosity=WARNING --insecure --join=crdb-0 --advertise-addr=crdb-1
+#     depends_on:
+#       - crdb-0
+#     volumes:
+#       - type: volume
+#         source: crdb-1
+#         target: /cockroach/cockroach-data
+
+
+#   crdb-2:
+#     container_name: crdb-2
+#     hostname: crdb-2
+#     image: cockroachdb/cockroach:latest
+#     command: start --cluster-name=lets-hangout --logtostderr=WARNING --log-file-verbosity=WARNING --insecure --join=crdb-0 --advertise-addr=crdb-2
+#     depends_on:
+#       - crdb-0
+#     volumes:
+#       - type: volume
+#         source: crdb-2
+#         target: /cockroach/cockroach-data
+
+
+#   lb:
+#     container_name: lb
+#     hostname: lb
+#     build: ./nginx
+#     ports:
+#       - "26257:26257"
+#       - "8080:8080"
+#     depends_on:
+#       - crdb-0
+#       - crdb-1
+#       - crdb-2
+#     volumes:
+#       - ./nginx:/etc/nginx:ro
+
+# volumes:
+#   crdb-0: {}
+#   crdb-1: {}
+#   crdb-2: {}
