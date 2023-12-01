@@ -18,8 +18,8 @@ class User(db.Model):
     def json(self):
         return {'id':self.id, 'username':self.username, 'email':self.email}
     
-
-db.create_all() # initializes db
+with app.app_context():
+  db.create_all() # initializes db
 
 @app.route('/')
 def index():
