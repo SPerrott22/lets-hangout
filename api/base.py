@@ -4,6 +4,8 @@ from flask_cors import CORS  # Corrected import
 from flask_sqlalchemy import SQLAlchemy
 from os import environ
 from flask_httpauth import HTTPBasicAuth
+# from sqlalchemy.dialects.postgresql import UUID
+# import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from sqlalchemy.ext.mutable import MutableList
@@ -17,24 +19,25 @@ db = SQLAlchemy(app)
 auth = HTTPBasicAuth()
 
 user_group = db.Table('user_group',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True)
+    db.Column('user_id', db.BigInteger, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('group_id', db.BigInteger, db.ForeignKey('group.id'), primary_key=True)
 )
 
 user_event = db.Table('user_event',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True)
+    db.Column('user_id', db.BigInteger, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('event_id', db.BigInteger, db.ForeignKey('event.id'), primary_key=True)
 )
 
 # Models
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
+    # id = db.Column(UUID(as_uuid=True), primary_key=True)
     email = db.Column(db.String(80), unique=True, nullable=False)
     first_name = db.Column(db.String(50))
     last_name = db.Column(db.String(50))
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(256))
     groups = db.relationship('Group', secondary=user_group, backref=db.backref('users', lazy='dynamic'))
-    events = db.relationship('Event', secondary=user_event, backref=db.backref('attendees', lazy='dynamic'))
+    events = db.relationship('Event', secondary=user_event, backref=db.backref('event_attendees', lazy='dynamic'))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -43,14 +46,14 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
 class Group(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     user_ids = db.Column(MutableList.as_mutable(PickleType), default=[])
     admin_ids = db.Column(MutableList.as_mutable(PickleType), default=[])
 
 class Event(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
+    id = db.Column(db.BigInteger, primary_key=True)
+    group_id = db.Column(db.BigInteger, db.ForeignKey('group.id'), nullable=False)
     title = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(250))
     time = db.Column(db.DateTime, nullable=False)
@@ -78,7 +81,7 @@ def verify_password(email, password):
 def get_users():
     page = max(request.args.get('page', 1, type=int), 1)
     per_page = min(max(request.args.get('per_page', 10, type=int), 1), 100)
-    users_paginated = User.query.paginate(page, per_page, error_out=False)
+    users_paginated = User.query.paginate(page=page, per_page=per_page, error_out=False)
     users = [{'id': u.id, 'email': u.email} for u in users_paginated.items]
 
     return jsonify({
@@ -87,6 +90,7 @@ def get_users():
         'pages': users_paginated.pages,
         'current_page': page
     }), 200
+
 
 # Routes
 @app.route('/user', methods=['POST'])
@@ -106,11 +110,18 @@ def create_user():
     db.session.commit()
     return jsonify({'id': new_user.id}), 201
 
-@app.route('/users/<int:user_id>', methods=['GET'])
-def get_user(user_id):
+@app.route('/users/<string:user_id_str>', methods=['GET'])
+def get_user(user_id_str):
+    try:
+        user_id = int(user_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid user ID format"}), 400
     user = User.query.get_or_404(user_id)
-    user_groups = Group.query.filter(Group.user_ids.contains(str(user_id))).all()
+    # user_groups = Group.query.filter(Group.user_ids.contains(str(user_id))).all()
+    # groups = [{'group_id': group.id, 'group_name': group.name} for group in user_groups]
+    user_groups = Group.query.filter(Group.users.any(id=user_id)).all()
     groups = [{'group_id': group.id, 'group_name': group.name} for group in user_groups]
+
     
     return jsonify({
         'email': user.email,
@@ -125,7 +136,7 @@ def get_user_groups(user_id):
     if not user:
         return jsonify({'message': 'User not found'}), 404
 
-    user_groups = Group.query.filter(Group.user_ids.contains(str(user_id))).all()
+    user_groups = Group.query.filter(Group.users.any(id=user_id)).all()
     result = [{'group_id': group.id, 'group_name': group.name} for group in user_groups]
 
     return jsonify(result), 200
@@ -157,15 +168,24 @@ def create_group():
 
 
 # Route to get group details
-@app.route('/groups/<int:group_id>', methods=['GET'])
-def get_group(group_id):
+@app.route('/groups/<string:group_id_str>', methods=['GET'])
+def get_group(group_id_str):
+    try:
+        group_id = int(group_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid group ID format"}), 400
     group = Group.query.get_or_404(group_id)
     users = [{'id': u.id, 'email': u.email, 'first_name': u.first_name, 'last_name': u.last_name} for u in group.users]
 
     return jsonify({'id': group.id, 'name': group.name, 'users': users}), 200
 
-@app.route('/group/<int:group_id>/add_admin', methods=['PUT'])
-def add_admin_to_group(group_id):
+@app.route('/group/<string:group_id_str>/add_admin', methods=['PUT'])
+def add_admin_to_group(group_id_str):
+    try:
+        group_id = int(group_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid group ID format"}), 400
+
     admin_id_to_add = request.json.get('admin_id')
     
     # Validate admin_id_to_add
@@ -191,8 +211,14 @@ def add_admin_to_group(group_id):
     db.session.commit()
     return jsonify({'message': 'Admin added to the group'}), 200
 
-@app.route('/group/<int:group_id>/remove_admin', methods=['PUT'])
-def remove_admin_from_group(group_id):
+@app.route('/group/<string:group_id_str>/remove_admin', methods=['PUT'])
+def remove_admin_from_group(group_id_str):
+    
+    try:
+        group_id = int(group_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid group ID format"}), 400
+
     admin_id_to_remove = request.json.get('admin_id')
     
     # Validate admin_id_to_remove
@@ -214,10 +240,14 @@ def remove_admin_from_group(group_id):
     return jsonify({'message': 'Admin removed from the group'}), 200
 
 def validate_users(user_ids):
-    for user_id in user_ids:
-        if not User.query.get(user_id):
-            return False, user_id
-    return True, None
+    return next(
+        (
+            (False, user_id)
+            for user_id in user_ids
+            if not User.query.get(user_id)
+        ),
+        (True, None),
+    )
 
 @app.route('/event', methods=['POST'])
 def create_event():
