@@ -368,6 +368,3 @@ def get_group_events(group_id):
             event_list.append({'event_id': event.id})
 
     return jsonify({'group_id': group_id, 'events': event_list}), 200
-
-if __name__ == '__main__':
-    app.run(debug=True)
