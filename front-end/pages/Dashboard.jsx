@@ -4,9 +4,9 @@ function EventBlock({title, time, guests}) {
     let guest_string = guests.join(", ");
 
     return <div className="eventBlock">
-        <h2>{title}</h2>
+        <div className="eventTitle">{title}</div>
         <p>{time}</p>
-        <p>{guest_string}</p>
+        <div className="eventGuests">{guest_string}</div>
     </div>;
 }
 
