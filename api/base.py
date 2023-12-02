@@ -1,4 +1,5 @@
 import time
+import pytz
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS  # Corrected import
 from flask_sqlalchemy import SQLAlchemy
@@ -8,8 +9,8 @@ from flask_httpauth import HTTPBasicAuth
 # import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from sqlalchemy.ext.mutable import MutableList
-from sqlalchemy import PickleType
+# from sqlalchemy.ext.mutable import MutableList
+# from sqlalchemy import PickleType
 
 app = Flask(__name__)
 CORS(app)
@@ -28,6 +29,11 @@ user_event = db.Table('user_event',
     db.Column('event_id', db.BigInteger, db.ForeignKey('event.id'), primary_key=True)
 )
 
+group_admin = db.Table('group_admin',
+    db.Column('user_id', db.BigInteger, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('group_id', db.BigInteger, db.ForeignKey('group.id'), primary_key=True)
+)
+
 # Models
 class User(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
@@ -37,7 +43,7 @@ class User(db.Model):
     last_name = db.Column(db.String(50))
     password_hash = db.Column(db.String(256))
     groups = db.relationship('Group', secondary=user_group, backref=db.backref('users', lazy='dynamic'))
-    events = db.relationship('Event', secondary=user_event, backref=db.backref('event_attendees', lazy='dynamic'))
+    events = db.relationship('Event', secondary=user_event, backref=db.backref('attendees', lazy='dynamic'))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -48,8 +54,10 @@ class User(db.Model):
 class Group(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    user_ids = db.Column(MutableList.as_mutable(PickleType), default=[])
-    admin_ids = db.Column(MutableList.as_mutable(PickleType), default=[])
+    # user_ids = db.Column(MutableList.as_mutable(PickleType), default=[])
+    # admin_ids = db.Column(MutableList.as_mutable(PickleType), default=[])
+    admin_ids = db.relationship('User', secondary=group_admin, backref=db.backref('admin_groups', lazy='dynamic'))
+
 
 class Event(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
@@ -57,7 +65,7 @@ class Event(db.Model):
     title = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(250))
     time = db.Column(db.DateTime, nullable=False)
-    attendees = db.Column(MutableList.as_mutable(PickleType), default=[])
+    # attendees = db.Column(MutableList.as_mutable(PickleType), default=[])
 
 # Create the database tables
 # Create the database tables within an application context
@@ -130,8 +138,12 @@ def get_user(user_id_str):
         'groups': groups
     }), 200
 
-@app.route('/user/<int:user_id>/groups', methods=['GET'])
-def get_user_groups(user_id):
+@app.route('/user/<string:user_id_str>/groups', methods=['GET'])
+def get_user_groups(user_id_str):
+    try:
+        user_id = int(user_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid user ID format"}), 400
     user = User.query.get(user_id)
     if not user:
         return jsonify({'message': 'User not found'}), 404
@@ -141,29 +153,66 @@ def get_user_groups(user_id):
 
     return jsonify(result), 200
 
+# @app.route('/group', methods=['POST'])
+# def create_group():
+#     name = request.json.get('name')
+#     user_ids = request.json.get('user_ids', [])  # Expecting a list of user IDs
+#     creator_id = request.json.get('creator_id')
+
+#     if not name:
+#         return jsonify({'message': 'Name is required'}), 400
+#     if not isinstance(user_ids, list):
+#         return jsonify({'message': 'user_ids must be a list'}), 400
+
+#     if not (admin := User.query.get(creator_id)):
+#         return jsonify({'message': 'Creator user does not exist'}), 404
+        
+
+#     new_group = Group(name=name)
+#     db.session.add(new_group)
+
+#     new_group.admin_ids.append(admin)
+
+#     # Check if all user IDs exist
+#     for user_id in user_ids:
+#         if user := User.query.get(user_id):
+#             new_group.users.append(user)
+#         else:
+#             return jsonify({'message': f'User ID {user_id} not found'}), 404
+
+#     db.session.commit()
+#     return jsonify({'id': new_group.id}), 201
+
 @app.route('/group', methods=['POST'])
 def create_group():
     name = request.json.get('name')
     user_ids = request.json.get('user_ids', [])  # Expecting a list of user IDs
-    
+    creator_id = request.json.get('creator_id')
+
     if not name:
         return jsonify({'message': 'Name is required'}), 400
     if not isinstance(user_ids, list):
         return jsonify({'message': 'user_ids must be a list'}), 400
-
-    # Check if all user IDs exist
-    for user_id in user_ids:
-        if not User.query.get(user_id):
-            return jsonify({'message': f'User ID {user_id} not found'}), 404
-
-    creator_id = request.json.get('creator_id')
-
-    if not User.query.get(creator_id):
+    if not (creator := User.query.get(creator_id)):
         return jsonify({'message': 'Creator user does not exist'}), 404
 
-    new_group = Group(name=name, user_ids=user_ids, admin_ids=[creator_id])
-    db.session.add(new_group)
-    db.session.commit()
+    new_group = Group(name=name)
+    db.session.add(new_group)  # Add the group to the session first
+
+    new_group.admin_ids.append(creator)  # Add creator as admin
+
+    invalid_user_ids = []
+    for user_id in user_ids:
+        if user := User.query.get(user_id):
+            new_group.users.append(user)
+        else:
+            invalid_user_ids.append(user_id)
+
+    if invalid_user_ids:
+        db.session.rollback()  # Rollback if there are invalid user IDs
+        return jsonify({'message': f'User IDs not found: {invalid_user_ids}'}), 404
+
+    db.session.commit()  # Commit the transaction
     return jsonify({'id': new_group.id}), 201
 
 
@@ -180,12 +229,12 @@ def get_group(group_id_str):
     return jsonify({'id': group.id, 'name': group.name, 'users': users}), 200
 
 @app.route('/group/<string:group_id_str>/add_admin', methods=['PUT'])
+@auth.login_required
 def add_admin_to_group(group_id_str):
     try:
         group_id = int(group_id_str)
     except ValueError:
         return jsonify({"error": "Invalid group ID format"}), 400
-
     admin_id_to_add = request.json.get('admin_id')
     
     # Validate admin_id_to_add
@@ -193,27 +242,60 @@ def add_admin_to_group(group_id_str):
         return jsonify({'message': 'Invalid admin ID'}), 400
 
     group = Group.query.get_or_404(group_id)
-    current_user_id = request.user.id
+    admin_to_add = User.query.get_or_404(admin_id_to_add, description="User to add as admin does not exist")
+
+    current_user = auth.current_user()  # Assuming request.user is a User instance
 
     # Check if the current user is an admin
-    if current_user_id not in group.admin_ids:
+    if current_user not in group.admin_ids:
         return jsonify({'message': 'Permission denied'}), 403
 
     # Check if the user to add is already an admin
-    if admin_id_to_add in group.admin_ids:
+    if admin_to_add in group.admin_ids:
         return jsonify({'message': 'User is already an admin'}), 409
 
-    # Check if the user to add exists
-    if not User.query.get(admin_id_to_add):
-        return jsonify({'message': 'User to add as admin does not exist'}), 404
-
-    group.admin_ids.append(admin_id_to_add)
+    # Add the user as an admin
+    group.admin_ids.append(admin_to_add)
     db.session.commit()
+
     return jsonify({'message': 'Admin added to the group'}), 200
 
-@app.route('/group/<string:group_id_str>/remove_admin', methods=['PUT'])
-def remove_admin_from_group(group_id_str):
+
+# @app.route('/group/<string:group_id_str>/add_admin', methods=['PUT'])
+# def add_admin_to_group(group_id_str):
+#     try:
+#         group_id = int(group_id_str)
+#     except ValueError:
+#         return jsonify({"error": "Invalid group ID format"}), 400
+
+#     admin_id_to_add = request.json.get('admin_id')
     
+#     # Validate admin_id_to_add
+#     if not isinstance(admin_id_to_add, int):
+#         return jsonify({'message': 'Invalid admin ID'}), 400
+
+#     group = Group.query.get_or_404(group_id)
+#     current_user = request.user
+
+#     # Check if the current user is an admin
+#     if current_user not in group.admin_ids:
+#         return jsonify({'message': 'Permission denied'}), 403
+
+#     # Check if the user to add is already an admin
+#     if admin_id_to_add in group.admin_ids:
+#         return jsonify({'message': 'User is already an admin'}), 409
+
+#     # Check if the user to add exists
+#     if not User.query.get(admin_id_to_add):
+#         return jsonify({'message': 'User to add as admin does not exist'}), 404
+
+#     group.admin_ids.append(admin_id_to_add)
+#     db.session.commit()
+#     return jsonify({'message': 'Admin added to the group'}), 200
+
+@app.route('/group/<string:group_id_str>/remove_admin', methods=['PUT'])
+@auth.login_required
+def remove_admin_from_group(group_id_str):
     try:
         group_id = int(group_id_str)
     except ValueError:
@@ -226,18 +308,50 @@ def remove_admin_from_group(group_id_str):
         return jsonify({'message': 'Invalid admin ID'}), 400
 
     group = Group.query.get_or_404(group_id)
-    current_user_id = request.user.id
+    admin_to_remove = User.query.get_or_404(admin_id_to_remove, description="Admin to remove does not exist")
+    
+    current_user = auth.current_user()  # Assuming request.user is a User instance
 
     # Check permission and ensure not removing self as the last admin
-    if current_user_id not in group.admin_ids or (len(group.admin_ids) == 1 and current_user_id == admin_id_to_remove):
+    if current_user not in group.admin_ids or (len(group.admin_ids) == 1 and current_user == admin_to_remove):
         return jsonify({'message': 'Permission denied'}), 403
 
-    if admin_id_to_remove not in group.admin_ids:
+    # Check if the user to remove is an admin
+    if admin_to_remove not in group.admin_ids:
         return jsonify({'message': 'User is not an admin of this group'}), 404
 
-    group.admin_ids.remove(admin_id_to_remove)
+    # Remove the user as an admin
+    group.admin_ids.remove(admin_to_remove)
     db.session.commit()
+    
     return jsonify({'message': 'Admin removed from the group'}), 200
+
+# @app.route('/group/<string:group_id_str>/remove_admin', methods=['PUT'])
+# def remove_admin_from_group(group_id_str):
+#     try:
+#         group_id = int(group_id_str)
+#     except ValueError:
+#         return jsonify({"error": "Invalid group ID format"}), 400
+
+#     admin_id_to_remove = request.json.get('admin_id')
+    
+#     # Validate admin_id_to_remove
+#     if not isinstance(admin_id_to_remove, int):
+#         return jsonify({'message': 'Invalid admin ID'}), 400
+
+#     group = Group.query.get_or_404(group_id)
+#     current_user_id = request.user.id
+
+#     # Check permission and ensure not removing self as the last admin
+#     if current_user_id not in group.admin_ids or (len(group.admin_ids) == 1 and current_user_id == admin_id_to_remove):
+#         return jsonify({'message': 'Permission denied'}), 403
+
+#     if admin_id_to_remove not in group.admin_ids:
+#         return jsonify({'message': 'User is not an admin of this group'}), 404
+
+#     group.admin_ids.remove(admin_id_to_remove)
+#     db.session.commit()
+#     return jsonify({'message': 'Admin removed from the group'}), 200
 
 def validate_users(user_ids):
     return next(
@@ -250,11 +364,16 @@ def validate_users(user_ids):
     )
 
 @app.route('/event', methods=['POST'])
+@auth.login_required
 def create_event():
     group_id = request.json.get('group_id')
     title = request.json.get('title')
     description = request.json.get('description')
-    event_time = utc.localize(datetime.strptime(request.json.get('time'), '%Y-%m-%d %H:%M:%S'))
+    time_str = request.json.get('time')  # Get the time as a string
+
+    # Convert the time string to a datetime object and localize it to UTC
+    event_time = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+    event_time = pytz.utc.localize(event_time)
     attendees = request.json.get('attendees', [])  # Expecting a JSON array of user IDs
 
     valid, invalid_id = validate_users(attendees)
@@ -265,136 +384,252 @@ def create_event():
         return jsonify({'message': 'Attendees must be a list'}), 400
 
     group = Group.query.get_or_404(group_id)
-    current_user_id = request.user.id
+    current_user = auth.current_user()
 
-    if current_user_id not in group.admin_ids:
+    if current_user not in group.admin_ids:
         return jsonify({'message': 'Only admins can create events for this group'}), 403
 
-    new_event = Event(group_id=group_id, title=title, description=description, time=event_time, attendees=attendees)
+    new_event = Event(group_id=group_id, title=title, description=description, time=event_time)
     db.session.add(new_event)
+
+    for user_id in attendees:
+      new_event.attendees.append(User.query.get(user_id))
+
     db.session.commit()
     return jsonify({'id': new_event.id}), 201
 
-@app.route('/event/<int:event_id>', methods=['PUT'])
-def update_event(event_id):
+@app.route('/event/<string:event_id_str>', methods=['PUT'])
+@auth.login_required
+def update_event(event_id_str):
+    try:
+        event_id = int(event_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid event ID format"}), 400
     event = Event.query.get_or_404(event_id)
-    current_user_id = request.user.id
+    group = Group.query.get_or_404(event.group_id)  # Get the group of the event
+    current_user = auth.current_user()
 
-    if current_user_id not in event.group.admin_ids:
+    if current_user not in group.admin_ids:
         return jsonify({'message': 'Only admins of this group can update its events'}), 403
 
-    event.title = request.json.get('title', event.title)
-    event.description = request.json.get('description', event.description)
-    attendees = request.json.get('attendees', event.attendees)
+    data = request.json
+    title = data.get('title')
+    description = data.get('description')
+    attendee_ids = data.get('attendees')
 
-    valid, invalid_id = validate_users(attendees)
-    if not valid:
-        return jsonify({'message': f'Invalid attendee ID: {invalid_id}'}), 404
+    # Update title if provided
+    if title is not None:
+        event.title = title
 
-    if not isinstance(attendees, list):
-        return jsonify({'message': 'Attendees must be a list'}), 400
+    # Update description if provided
+    if description is not None:
+        event.description = description
 
-    event.attendees = attendees
+    # Update attendees if provided
+    if attendee_ids is not None:
+        if not isinstance(attendee_ids, list):
+            return jsonify({'message': 'Attendees must be a list'}), 400
+
+        # Remove existing attendees
+        for attendee in event.attendees:
+            event.attendees.remove(attendee)
+
+
+        for attendee_id in attendee_ids:
+            if attendee := User.query.get(attendee_id):
+                event.attendees.append(attendee)
+            else:
+                return jsonify({'message': f'Invalid attendee ID: {attendee_id}'}), 404
+    # event.title = request.json.get('title', event.title)
+    # event.description = request.json.get('description', event.description)
+    # attendee_ids = request.json.get('attendees', [])
+    # if not isinstance(attendee_ids, list):
+    #     return jsonify({'message': 'Attendees must be a list'}), 400
+
+    # attendees = request.json.get('attendees', event.attendees)
+
+    # valid, invalid_id = validate_users(attendees)
+    # if not valid:
+    #     return jsonify({'message': f'Invalid attendee ID: {invalid_id}'}), 404
+
+    # if not isinstance(attendees, list):
+    #     return jsonify({'message': 'Attendees must be a list'}), 400
+
+    # event.attendees = attendees
 
     db.session.commit()
     return jsonify({'id': event.id}), 200
 
 
-@app.route('/group/<int:group_id>/add_users', methods=['PUT'])
-def add_users_to_group(group_id):
+@app.route('/group/<string:group_id_str>/add_users', methods=['PUT'])
+def add_users_to_group(group_id_str):
+    try:
+        group_id = int(group_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid group ID format"}), 400
     group = Group.query.get_or_404(group_id)
     user_ids = request.json.get('user_ids')
 
-    for user_id in user_ids:
-        user = User.query.get_or_404(user_id)
-        group.users.append(user)
+    current_user_ids = {user.id for user in group.users}  
+    new_users_added = False
 
-    db.session.commit()
+    for user_id in user_ids:
+        if user_id not in current_user_ids:
+          user = User.query.get_or_404(user_id)
+          group.users.append(user)
+          new_users_added = True
+
+    if new_users_added:
+      db.session.commit()
     return jsonify({'message': 'Users added to group'}), 200
 
-@app.route('/group/<int:group_id>/remove_users', methods=['PUT'])
-def remove_users_from_group(group_id):
+@app.route('/group/<string:group_id_str>/remove_users', methods=['PUT'])
+def remove_users_from_group(group_id_str):
+    try:
+        group_id = int(group_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid group ID format"}), 400
     group = Group.query.get_or_404(group_id)
     user_ids = request.json.get('user_ids')
 
-    for user_id in user_ids:
-        user = User.query.get_or_404(user_id)
-        group.users.remove(user)
+    current_user_ids = {user.id for user in group.users}  # Set of existing user IDs in the group
+    users_removed = False
 
-    db.session.commit()
+    for user_id in user_ids:
+        if user_id in current_user_ids:
+          user = User.query.get_or_404(user_id)
+          group.users.remove(user)
+          users_removed = True
+
+    if users_removed:
+      db.session.commit()
     return jsonify({'message': 'Users removed from group'}), 200
 
 
-@app.route('/user/<int:user_id>/groups_events', methods=['GET'])
-def get_user_groups_events(user_id):
+@app.route('/user/<string:user_id_str>/groups_events', methods=['GET'])
+def get_user_groups_events(user_id_str):
+    try:
+        user_id = int(user_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid user ID format"}), 400
+
     user = User.query.get_or_404(user_id)
-    if not user:
-        return jsonify({'message': 'User not found'}), 404
-
-    user_groups = Group.query.filter(Group.user_ids.contains(str(user_id))).all()
     result = []
-
-    for group in user_groups:
+    for group in user.groups:
         group_info = {'group_id': group.id, 'group_name': group.name, 'events': []}
-        events = Event.query.filter_by(group_id=group.id).all()
-
-        for event in events:
+        for event in Event.query.filter_by(group_id=group.id).all():
             event_info = {
                 'event_id': event.id,
                 'title': event.title,
                 'description': event.description,
                 'time': event.time.strftime('%Y-%m-%d %H:%M:%S'),
-                'attendees': []
+                'attendees': [{'id': attendee.id, 'email': attendee.email} for attendee in event.attendees]
             }
 
-            attendee_ids = event.attendees.split(',') if event.attendees else []
-            for attendee_id in attendee_ids:
-                attendee = User.query.get(attendee_id)
-                if attendee:
-                    attendee_info = {'id': attendee.id, 'email': attendee.email}
-                    event_info['attendees'].append(attendee_info)
-
             if 'full' in request.args and request.args['full'].lower() == 'true':
-                # Include full event information
                 group_info['events'].append(event_info)
             else:
-                # Include only event IDs if full details not requested
                 group_info['events'].append({'event_id': event.id})
 
         result.append(group_info)
 
     return jsonify(result), 200
 
-@app.route('/group/<int:group_id>/events', methods=['GET'])
-def get_group_events(group_id):
-    group = Group.query.get(group_id)
-    if not group:
-        return jsonify({'message': 'Group not found'}), 404
 
-    events = Event.query.filter_by(group_id=group_id).all()
+
+    # if not user:
+    #     return jsonify({'message': 'User not found'}), 404
+
+    # user_groups = Group.query.filter(Group.user_ids.contains(str(user_id))).all()
+    # result = []
+
+    # for group in user_groups:
+    #     group_info = {'group_id': group.id, 'group_name': group.name, 'events': []}
+    #     events = Event.query.filter_by(group_id=group.id).all()
+
+    #     for event in events:
+    #         event_info = {
+    #             'event_id': event.id,
+    #             'title': event.title,
+    #             'description': event.description,
+    #             'time': event.time.strftime('%Y-%m-%d %H:%M:%S'),
+    #             'attendees': []
+    #         }
+
+    #         attendee_ids = event.attendees.split(',') if event.attendees else []
+    #         for attendee_id in attendee_ids:
+    #             if attendee := User.query.get(attendee_id):
+    #                 attendee_info = {'id': attendee.id, 'email': attendee.email}
+    #                 event_info['attendees'].append(attendee_info)
+
+    #         if 'full' in request.args and request.args['full'].lower() == 'true':
+    #             # Include full event information
+    #             group_info['events'].append(event_info)
+    #         else:
+    #             # Include only event IDs if full details not requested
+    #             group_info['events'].append({'event_id': event.id})
+
+    #     result.append(group_info)
+
+    # return jsonify(result), 200
+
+@app.route('/group/<string:group_id_str>/events', methods=['GET'])
+def get_group_events(group_id_str):
+    try:
+        group_id = int(group_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid group ID format"}), 400
+    
+    group = Group.query.get_or_404(group_id)
+
+    events = Event.query.filter_by(group_id=group.id).all()
     event_list = []
 
     for event in events:
+        event_info = {
+            'event_id': event.id,
+            'title': event.title,
+            'description': event.description,
+            'time': event.time.strftime('%Y-%m-%d %H:%M:%S')
+        }
+
         if 'full' in request.args and request.args['full'].lower() == 'true':
-            # Include full event information
-            event_info = {
-                'event_id': event.id,
-                'title': event.title,
-                'description': event.description,
-                'time': event.time.strftime('%Y-%m-%d %H:%M:%S'),
-                'attendees': []
-            }
-
-            attendee_ids = event.attendees.split(',') if event.attendees else []
-            for attendee_id in attendee_ids:
-                attendee = User.query.get(attendee_id)
-                if attendee:
-                    attendee_info = {'id': attendee.id, 'email': attendee.email}
-                    event_info['attendees'].append(attendee_info)
-
+            # Include full event information along with attendees
+            event_info['attendees'] = [{'id': attendee.id, 'email': attendee.email} for attendee in event.attendees]
             event_list.append(event_info)
         else:
             # Include only event IDs
             event_list.append({'event_id': event.id})
 
     return jsonify({'group_id': group_id, 'events': event_list}), 200
+
+    # group = Group.query.get(group_id)
+    # if not group:
+    #     return jsonify({'message': 'Group not found'}), 404
+
+    # events = Event.query.filter_by(group_id=group_id).all()
+    # event_list = []
+
+    # for event in events:
+    #     if 'full' in request.args and request.args['full'].lower() == 'true':
+    #         # Include full event information
+    #         event_info = {
+    #             'event_id': event.id,
+    #             'title': event.title,
+    #             'description': event.description,
+    #             'time': event.time.strftime('%Y-%m-%d %H:%M:%S'),
+    #             'attendees': []
+    #         }
+
+    #         attendee_ids = event.attendees.split(',') if event.attendees else []
+    #         for attendee_id in attendee_ids:
+    #             if attendee := User.query.get(attendee_id):
+    #                 attendee_info = {'id': attendee.id, 'email': attendee.email}
+    #                 event_info['attendees'].append(attendee_info)
+
+    #         event_list.append(event_info)
+    #     else:
+    #         # Include only event IDs
+    #         event_list.append({'event_id': event.id})
+
+    # return jsonify({'group_id': group_id, 'events': event_list}), 200
