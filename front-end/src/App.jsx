@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 import Dashboard from '../pages/Dashboard';
 import Login from '../pages/Login';
 import RequireAuth from '../components/RequireAuth';
+import MyCalendar from '../pages/Calendar';
 import axios from "axios";
 import logo from '/vite.svg';
 import api from './api';
@@ -58,6 +59,7 @@ function App() {
                   <Dashboard />
                 </RequireAuth>
               }/>
+              <Route path="/calendar" element={<MyCalendar />} /> 
             </Routes>
           <ul>
             <li>
@@ -65,6 +67,9 @@ function App() {
             </li>
             <li>
               <Link to='/dashboard'>Dashboard</Link>
+            </li>
+            <li>
+              <Link to='/calendar'>Calendar</Link>
             </li>
           </ul>
         </div>
