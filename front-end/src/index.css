@@ -74,6 +74,8 @@ header {
   border-bottom-style: solid;
   border-bottom-width: medium;
   background-color: #242424;
+  z-index: 100;
+  height: 80px;
 }
 
 header a {
