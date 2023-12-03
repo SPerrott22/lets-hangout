@@ -1,6 +1,7 @@
 .calendar {
     text-align: center;
     position: relative; /* or absolute or fixed, depending on your layout */
+    background-color: white;
   }
   
   .calendar-logo {
