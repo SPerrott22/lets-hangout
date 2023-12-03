@@ -12,6 +12,7 @@ import logo from '/vite.svg';
 import api from './api';
 import useToken from './useToken';
 import './App.css';
+import EventForm from '../pages/EventCreation';
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -64,7 +65,16 @@ function App() {
                   <Dashboard tokenInfo={tokenInfo}/>
                 </RequireAuth>
               }/>
-              <Route path="/calendar" element={<MyCalendar />} /> 
+              <Route path="/calendar" element={ 
+                <RequireAuth>
+                  <MyCalendar />
+                </RequireAuth>
+              } /> 
+              <Route path="/event_creation" element= {
+                <RequireAuth>
+                  <EventForm />
+                </RequireAuth>
+              } /> 
             </Routes>
           <ul>
             <li>
@@ -75,6 +85,9 @@ function App() {
             </li>
             <li>
               <Link to='/calendar'>Calendar</Link>
+            </li>
+            <li>
+              <Link to='/event_creation'>Event Creation</Link>
             </li>
           </ul>
         </div>
