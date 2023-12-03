@@ -2,6 +2,7 @@
     display: flex;
     flex-wrap: wrap;
     place-items: center;
+    background-color: rgba(70, 71, 73, 0.897)
 }
 
 .eventBlock {
@@ -16,6 +17,10 @@
 
     display: grid; 
     place-items: center;
+}
+
+.eventBlock:hover {
+    border: solid 4px rgb(2, 23, 253);
 }
 
 .eventTitle {
@@ -36,3 +41,59 @@
     text-overflow: ellipsis;
 }
 
+.expandedEvent {
+    border: solid 4px white;
+    border-radius: 25px;
+    background-color: rgba(56, 150, 208);
+    width: 300px;
+    height: 300px;
+
+    place-items: center;
+
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 25;
+    right: 0;
+    left: 0;
+}
+
+.xButton {
+    border-radius: 50%;
+    padding: 0.5em;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    color: white;
+    left: 255px;
+    top: 10px;
+    
+    position: relative;
+    
+}
+
+
+
+.xButton::before {
+    content: " ";
+    position: absolute;
+    display: block;
+    background-color: white;
+    width: 2px;
+    left: 12px;
+    top: 3px;
+    bottom: 3px;
+    transform: rotate(45deg);
+}
+
+.xButton::after {
+    content: " ";
+    position: absolute;
+    display: block;
+    background-color: white;
+    height: 2px;
+    top:12px;
+    left: 3px;
+    right: 3px;
+    transform: rotate(45deg);
+}
