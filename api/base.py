@@ -633,3 +633,11 @@ def get_group_events(group_id_str):
     #         event_list.append({'event_id': event.id})
 
     # return jsonify({'group_id': group_id, 'events': event_list}), 200
+
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+  response_body = {
+    "token": "yahaha"
+  }
+
+  return make_response(jsonify(response_body), 200)

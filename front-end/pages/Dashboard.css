@@ -1,0 +1,38 @@
+.eventArea {
+    display: flex;
+    flex-wrap: wrap;
+    place-items: center;
+}
+
+.eventBlock {
+    border: solid 4px white;
+    border-radius: 25px;
+    background-color: rgba(56, 150, 208, 0.897);
+    margin: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 320px;
+    height: 140px;
+
+    display: grid; 
+    place-items: center;
+}
+
+.eventTitle {
+    width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    font-size: larger;
+    font-weight: bold;
+}
+
+
+.eventGuests {
+    width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+

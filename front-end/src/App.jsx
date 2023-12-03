@@ -2,19 +2,24 @@ import { useState } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import About from '../pages/About';
 import Home from '../pages/Home';
+import Dashboard from '../pages/Dashboard';
+import Login from '../pages/Login';
+import RequireAuth from '../components/RequireAuth';
+import MyCalendar from '../pages/Calendar';
 import axios from "axios";
 import logo from '/vite.svg';
 import api from './api';
-import './App.css'
+import useToken from './useToken';
+import './App.css';
 
 function App() {
   // const [count, setCount] = useState(0)
 
-  const [profileData, setProfileData] = useState(null)
-  
+  const [profileData, setProfileData] = useState(null);
+  const { token, setToken } = useToken();
 
+  /*
   function getData() {
     api({
       method: "GET",
@@ -32,44 +37,42 @@ function App() {
         console.log(error.response.headers)
         }
     })}
+    */
+
+    /*
+    if (!token) {
+      return <Login setToken={setToken} />;
+    }
+    */
 
     return (
       <BrowserRouter>
-
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-  
-          {/* new line start*/}
-          <p>To get your profile details: </p><button onClick={getData}>Click me</button>
-          {profileData && <div>
-                <p>Profile name: {profileData.profile_name}</p>
-                <p>About me: {profileData.about_me}</p>
-              </div>
-          }
-           {/* end of new line */}
-        </header>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-          </Routes>
-        <ul>
-          <li>
-            <Link to='/about'>about</Link>
-          </li>
-        </ul>
-      </div>
+        <div className="App">
+          <header className="App-header">
+            <a href="/">Let's Hangout!</a>
+          </header>
+            <Routes>
+              <Route exact path="/" element={<Home />} />
+              <Route path="/login" element={<Login setToken={setToken} />} />
+              <Route path="/dashboard" element={
+                <RequireAuth>
+                  <Dashboard />
+                </RequireAuth>
+              }/>
+              <Route path="/calendar" element={<MyCalendar />} /> 
+            </Routes>
+          <ul>
+            <li>
+              <Link to='/'>Home</Link>
+            </li>
+            <li>
+              <Link to='/dashboard'>Dashboard</Link>
+            </li>
+            <li>
+              <Link to='/calendar'>Calendar</Link>
+            </li>
+          </ul>
+        </div>
       </BrowserRouter>
     );
   
