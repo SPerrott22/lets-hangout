@@ -60,8 +60,16 @@ function App() {
                   <Dashboard />
                 </RequireAuth>
               }/>
-              <Route path="/calendar" element={<MyCalendar />} /> 
-              <Route path="/event_creation" element={<EventForm />} /> 
+              <Route path="/calendar" element={ 
+                <RequireAuth>
+                  <MyCalendar />
+                </RequireAuth>
+              } /> 
+              <Route path="/event_creation" element= {
+                <RequireAuth>
+                  <EventForm />
+                </RequireAuth>
+              } /> 
             </Routes>
           <ul>
             <li>
