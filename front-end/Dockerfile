@@ -6,7 +6,7 @@ COPY package*.json .
 
 RUN npm install
 
-RUN mkdir /app/node_modules/.vite && chmod -R 777 /app/node_modules/.vite
+RUN mkdir /app/node_modules/.vite && mkdir /app/node_modules/.vite/deps && chmod 777 /app/node_modules/.vite && chmod 777 /app/node_modules/.vite/deps
 
 COPY . .
 

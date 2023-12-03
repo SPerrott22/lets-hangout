@@ -1,4 +1,7 @@
 flask
 psycopg2-binary
+sqlalchemy-cockroachdb
 Flask-SQLAlchemy
 flask-cors
+flask_httpauth
+pytz
