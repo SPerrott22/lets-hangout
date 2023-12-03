@@ -1,16 +1,18 @@
 import time
 import pytz
 from flask import Flask, request, jsonify, make_response
+from flask_jwt_extended import JWTManager, create_access_token
 from flask_cors import CORS  # Corrected import
 from flask_sqlalchemy import SQLAlchemy
 from os import environ
 from flask_httpauth import HTTPBasicAuth
 # from sqlalchemy.dialects.postgresql import UUID
 # import uuid
-from werkzeug.security import generate_password_hash, check_password_hash
+# from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 # from sqlalchemy.ext.mutable import MutableList
 # from sqlalchemy import PickleType
+from argon2 import PasswordHasher
 
 app = Flask(__name__)
 CORS(app)
@@ -18,6 +20,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = environ.get("DB_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 auth = HTTPBasicAuth()
+ph = PasswordHasher()
+
+app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # Use a secure secret key
+jwt = JWTManager(app)
+
 
 user_group = db.Table('user_group',
     db.Column('user_id', db.BigInteger, db.ForeignKey('user.id'), primary_key=True),
@@ -46,10 +53,10 @@ class User(db.Model):
     events = db.relationship('Event', secondary=user_event, backref=db.backref('attendees', lazy='dynamic'))
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = ph.hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return ph.verify(self.password_hash, password)
 
 class Group(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
@@ -634,10 +641,16 @@ def get_group_events(group_id_str):
 
     # return jsonify({'group_id': group_id, 'events': event_list}), 200
 
-@app.route('/login', methods = ['GET', 'POST'])
+@app.route('/login', methods = ['POST'])
+@auth.login_required
 def login():
-  response_body = {
-    "token": "yahaha"
-  }
+  current_user = auth.current_user()
+  if current_user is None:
+    return "Invalid credentials", 401
+  access_token = create_access_token(identity=current_user.email)
+  return jsonify(token=access_token), 200
 
-  return make_response(jsonify(response_body), 200)
+
+
+
+  

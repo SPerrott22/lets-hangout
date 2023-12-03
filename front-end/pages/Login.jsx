@@ -2,16 +2,49 @@ import './Login.css';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-async function loginUser(credentials) {
+async function loginUser(username, password) {
+    const base64Credentials = btoa(username + ':' + password);
+
     return fetch('http://localhost:4000/login', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(credentials)
+            'Authorization': 'Basic ' + base64Credentials
+        }
     })
-    .then(data => data.json())
+    .then(response => response.json())
+    .then(data => {
+        // console.log('Success:', data);
+        // Handle your JWT token here, e.g., storing it for future requests
+        if (!data.token) {
+            throw new Error('Token not found in response');
+        }
+        return data
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
+
+// function login(username, password) {
+//     // Encode username and password in Base64
+//     const base64Credentials = btoa(username + ':' + password);
+
+//     fetch('http://localhost:4000/login', {
+//         method: 'GET', // or 'POST' if your backend is set up to handle POST
+//         headers: {
+//             'Authorization': 'Basic ' + base64Credentials,
+//         },
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         console.log('Success:', data);
+//         // Handle your JWT token here, e.g., storing it for future requests
+//     })
+//     .catch((error) => {
+//         console.error('Error:', error);
+//     });
+// }
+
 
 export default function Login({ setToken }) {
     let navigate = useNavigate();
@@ -23,10 +56,10 @@ export default function Login({ setToken }) {
 
     const handleSubmit = async e => {
         e.preventDefault();
-        const token = await loginUser({
+        const token = await loginUser(
             username,
             password
-        });
+        );
         setToken(token);
         navigate(from, { replace: true });
     }
