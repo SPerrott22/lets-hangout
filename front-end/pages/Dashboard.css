@@ -1,14 +1,17 @@
+body {
+    background-color: rgb(162, 162, 162);
+}
+
 .eventArea {
     display: flex;
     flex-wrap: wrap;
     place-items: center;
-    background-color: rgba(70, 71, 73, 0.897)
 }
 
 .eventBlock {
-    border: solid 4px rgb(180, 180, 180);
+    border: solid 4px white;
     border-radius: 25px;
-    background-color: rgba(56, 150, 208, 0.897);
+    background-color: rgb(110, 171, 209);
     margin: 20px;
     padding-top: 20px;
     padding-bottom: 20px;
@@ -42,9 +45,9 @@
 }
 
 .expandedEvent {
-    border: solid 4px rgb(180, 180, 180);
+    border: solid 4px white;
     border-radius: 25px;
-    background-color: rgba(56, 150, 208);
+    background-color: rgba(110, 171, 209);
     width: 600px;
 
     height: 300px;
