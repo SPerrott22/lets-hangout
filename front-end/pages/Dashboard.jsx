@@ -34,14 +34,18 @@ export default function Dashboard() {
         setShow(true);
     }
 
+    function onXClick() {
+        setShow(false);
+    }
+
     console.log(popup.title);
     return <div className="dashboard">
         {show && <div className="expandedEvent">
-            <div className="xButton"></div>
+            <div className="xButton" onClick={() => onXClick()}></div>
             <h2>{popup.title}</h2>
             <p>{popup.time}</p>
             <p>{popup.guests}</p>
-            <p>{popup.description}</p>
+            <div className="expandedEventDescription">{popup.description}</div>
         </div>}
         <div className="eventArea">
             {eventItems}
