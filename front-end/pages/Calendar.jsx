@@ -22,7 +22,7 @@ class MyCalendar extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div className="calendar">
         <Calendar
           localizer={localizer}
           defaultDate={new Date()}
