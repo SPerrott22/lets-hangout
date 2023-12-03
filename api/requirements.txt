@@ -5,3 +5,5 @@ Flask-SQLAlchemy
 flask-cors
 flask_httpauth
 pytz
+argon2-cffi
+flask_jwt_extended

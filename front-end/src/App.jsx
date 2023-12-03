@@ -17,8 +17,13 @@ import EventForm from '../pages/EventCreation';
 function App() {
   // const [count, setCount] = useState(0)
 
-  const [profileData, setProfileData] = useState(null);
-  const { token, setToken } = useToken();
+  // const [profileData, setProfileData] = useState(null);
+  const { tokenInfo, setToken } = useToken();
+
+  // useEffect(() => {
+  //   console.log('New tokenInfo:', tokenInfo);
+  // }, [tokenInfo]);
+
 
   /*
   function getData() {
@@ -54,10 +59,10 @@ function App() {
           </header>
             <Routes>
               <Route exact path="/" element={<Home />} />
-              <Route path="/login" element={<Login setToken={setToken} />} />
+              <Route path="/login" element={<Login setToken={setToken} tokenInfo={tokenInfo} />} />
               <Route path="/dashboard" element={
                 <RequireAuth>
-                  <Dashboard />
+                  <Dashboard tokenInfo={tokenInfo}/>
                 </RequireAuth>
               }/>
               <Route path="/calendar" element={ 
