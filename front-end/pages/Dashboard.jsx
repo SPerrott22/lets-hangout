@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
 import './Dashboard.css';
 
 function EventBlock({ title, time, attendees, description, handleClick }) {
@@ -13,13 +14,15 @@ function EventBlock({ title, time, attendees, description, handleClick }) {
         </div>
     );
 }
-
-export default function Dashboard({ tokenInfo }) {
+//{ tokenInfo }
+export default function Dashboard() {
     const [groupsEvents, setGroupsEvents] = useState([]);
     const [show, setShow] = useState(false);
     const [popup, setPopup] = useState({ title: "", time: "", guests: "", description: "" });
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
+    const { tokenInfo, deleteToken } = useContext(TokenContext); // Use context
+
 
     useEffect(() => {
         if (tokenInfo.token && tokenInfo.userId) {
@@ -48,9 +51,10 @@ export default function Dashboard({ tokenInfo }) {
 
     function handleTokenExpiration() {
         // Optionally clear token or any auth-related data here
-        localStorage.removeItem('token');
-        localStorage.removeItem('user_id');
+        // localStorage.removeItem('token');
+        // localStorage.removeItem('user_id');
         // Redirect to login
+        deleteToken(); 
         navigate('/login');
     }
     function onEventClick(title, time, attendees, description) {

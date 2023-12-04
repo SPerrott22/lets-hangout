@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
@@ -10,15 +10,19 @@ import MyCalendar from '../pages/Calendar';
 import axios from "axios";
 import logo from '/vite.svg';
 import api from './api';
-import useToken from './useToken';
+// import useToken from './useToken';
 import './App.css';
 import EventForm from '../pages/EventCreation';
+import { TokenContext } from '../context/TokenContext.jsx';
+
 
 function App() {
+  const { tokenInfo, deleteToken } = useContext(TokenContext);
+
   // const [count, setCount] = useState(0)
 
   // const [profileData, setProfileData] = useState(null);
-  const { tokenInfo, setToken } = useToken();
+  // const { tokenInfo, setToken, deleteToken } = useToken();
 
   // useEffect(() => {
   //   console.log('New tokenInfo:', tokenInfo);
@@ -51,18 +55,31 @@ function App() {
     }
     */
 
+    const handleLogout = () => {
+      deleteToken(); // This will remove the token from localStorage and update the state
+    };
+  
+    // tokenInfo={tokenInfo}
+    //setToken={setToken} tokenInfo={tokenInfo} 
+
     return (
+      // <TokenProvider>
       <BrowserRouter>
         <div className="App">
           <header className="App-header">
             <a href="/">Let's Hangout!</a>
+            {tokenInfo.token && (
+            <button onClick={handleLogout} className="logout-button">
+              Logout
+            </button>
+          )}
           </header>
             <Routes>
               <Route exact path="/" element={<Home />} />
-              <Route path="/login" element={<Login setToken={setToken} tokenInfo={tokenInfo} />} />
+              <Route path="/login" element={<Login />} />
               <Route path="/dashboard" element={
                 <RequireAuth>
-                  <Dashboard tokenInfo={tokenInfo}/>
+                  <Dashboard /> 
                 </RequireAuth>
               }/>
               <Route path="/calendar" element={ 
@@ -92,6 +109,7 @@ function App() {
           </ul>
         </div>
       </BrowserRouter>
+      // </TokenProvider>
     );
   
 
