@@ -49,12 +49,24 @@ const GroupForm = () => {
       // If 'x' button is clicked, clear the selected users
       setSelectedUsers([]);
     } else if (action.action === 'select-option') {
-        // If a user is selected (not popped using 'x'), add it to the selectedUsers state
-        console.log(selectedOption);
-        setSelectedUsers(selectedOption);
-        console.log(selectedUsers);
+      // If a user is selected (not popped using 'x'), add it to the selectedUsers state
+      console.log(selectedOption);
+      setSelectedUsers(selectedOption);
+      console.log(selectedUsers);
+    } else if (action.action === 'remove-value') {
+      // If a user clicks the 'x' on the option, remove it from the selectedUsers state
+      const toRemove = action.removedValue;
+      setSelectedUsers(selectedUsers.filter(el => el.value !== toRemove.value))
+    } else if (action.action === 'pop-value') {
+      // If a user types backspace when search is blank, remove the last option from the selectedUsers state
+      // Almost same logic as remove-value, just toRemove could be null
+      const toRemove = action.removedValue;
+      if (toRemove) {
+        setSelectedUsers(selectedUsers.filter(el => el.value !== toRemove.value))
+      }
     } else {
         console.log("Not clear or select option");
+        console.log(selectedOption);
         console.log(action);
     }
   
