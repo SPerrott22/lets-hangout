@@ -3,7 +3,7 @@ import Select from 'react-select';
 import useToken from "../src/useToken";
 
 const GroupForm = () => {
-  // const [selectedUsers, setSelectedUsers] = useState([{value: "1234", label: "ash ketchum"}]);
+  const [groupName, setGroupName] = useState('');  
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [options, setOptions] = useState([]);
@@ -36,11 +36,6 @@ const GroupForm = () => {
 
   const handleInputChange = (newValue) => {
     setSearchTerm(newValue);
-    /*
-    if (!newValue) {
-    }
-    */
-  
     fetchUsers(newValue);
   };
 
@@ -49,20 +44,30 @@ const GroupForm = () => {
       // If 'x' button is clicked, clear the selected users
       setSelectedUsers([]);
     } else if (action.action === 'select-option') {
-        // If a user is selected (not popped using 'x'), add it to the selectedUsers state
-        console.log(selectedOption);
-        setSelectedUsers(selectedOption);
-        console.log(selectedUsers);
+      // If a user is selected (not popped using 'x'), add it to the selectedUsers state
+      console.log(selectedOption);
+      setSelectedUsers(selectedOption);
+      console.log(selectedUsers);
+    } else if (action.action === 'remove-value') {
+      // If a user clicks the 'x' on the option, remove it from the selectedUsers state
+      const toRemove = action.removedValue;
+      setSelectedUsers(selectedUsers.filter(el => el.value !== toRemove.value))
+    } else if (action.action === 'pop-value') {
+      // If a user types backspace when search is blank, remove the last option from the selectedUsers state
+      // Almost same logic as remove-value, just toRemove could be null
+      const toRemove = action.removedValue;
+      if (toRemove) {
+        setSelectedUsers(selectedUsers.filter(el => el.value !== toRemove.value))
+      }
     } else {
         console.log("Not clear or select option");
+        console.log(selectedOption);
         console.log(action);
     }
   
     setSearchTerm('');
     setOptions([]);
   };
-  
-  
 
   const handleCreateGroup = async () => {
     try {
@@ -77,7 +82,7 @@ const GroupForm = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: "GroupNameEpic",
+          name: groupName,
           user_ids: userIds,
           creator_id: tokenInfo.userId
           // Additional data for group creation if needed
@@ -92,16 +97,23 @@ const GroupForm = () => {
       } else {
         const errorData = await response.json();
         console.error('Error creating group:', errorData.message);
+        setGroupCreated(false);
       }
     } catch (error) {
       console.error('Error creating group:', error.message);
+      setGroupCreated(false);
     }
+    setGroupName('');
+    setSelectedUsers([]);
+    setSearchTerm('');
+    setOptions([]);
   };
 
   return (
     <div>
       {groupCreated && <p>Group created successfully!</p>}
       <h2>Create Group</h2>
+      <input type='text' value={groupName} onChange={e => setGroupName(e.target.value)} />
       <Select
         isMulti
         value={selectedUsers}
