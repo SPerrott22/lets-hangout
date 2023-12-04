@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react';
+import Select from 'react-select';
 import moment from 'moment';
 import './EventCreation.css'; // Import the CSS file for styling
 import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
 
 const EventForm = () => {
   const [title, setTitle] = useState('');
-  const [start_date, setStartDate] = useState('');
-  const [start_time, setStartTime] = useState('');
-  const [end_date, setEndDate] = useState('');
-  const [end_time, setEndTime] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [description, setDescription] = useState('');
-  const [selected_group, setSelectedGroup] = useState('');
-  const [group, setGroup] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState();
+  const [groupOptions, setGroupOptions] = useState([]);
 
   const { tokenInfo, deleteToken } = useContext(TokenContext);
 
@@ -19,9 +20,18 @@ const EventForm = () => {
     // Fetch user's groups when the component mounts
     const fetchGroups = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/user/${tokenInfo.userId}/groups`);
+        const response = await fetch(`http://localhost:4000/user/${tokenInfo.userId}/groups`,{
+          method: 'GET',
+        });
         const data = await response.json();
-        setGroup(data);
+        console.log("Response fron server:", data);
+
+        const groupOptions = data.map((g) => ({
+          value: g.group_id,
+          label: g.group_name
+        }))
+
+        setGroupOptions(groupOptions);
       } catch (error) {
         console.error('Error fetching user groups:', error);
       }
@@ -30,14 +40,27 @@ const EventForm = () => {
     fetchGroups();
   }, [tokenInfo.userId]); // Run this effect when the user ID changes
 
-  const groups = ['Group A', 'Group B', 'Group C']; // Add your group names here
+  const handleGroupSelect = (selectedOption, action) => {
+    if (action.action === 'clear') {
+    } else if (action.action === 'select-option') {
+      setSelectedGroup(selectedOption);
+    } else if (action.action === 'remove-value') {
+    } else if (action.action === 'pop-value') {
+    } else {
+        console.log("Not clear or select option");
+        console.log(selectedOption);
+        console.log(action);
+    }
+  };
+
+  // const groups = ['Group A', 'Group B', 'Group C']; // Add your group names here
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const startDateTime = moment(`${start_date} ${start_time}`, 'MM/DD/YY HH:mm');
-    const endDateTime = moment(`${end_date} ${end_time}`, 'MM/DD/YY HH:mm');
+    const startDateTime = moment(`${startDate} ${startTime}`, 'MM/DD/YY HH:mm');
+    const endDateTime = moment(`${endDate} ${endTime}`, 'MM/DD/YY HH:mm');
 
-    console.log('Form submitted:', { title, startDateTime, endDateTime, description, selected_group });
+    console.log('Form submitted:', { title, startDateTime, endDateTime, description, selectedGroup });
 
     // You can perform further actions with the collected data here
     // For now, it's just logging the data to the console
@@ -71,6 +94,15 @@ const EventForm = () => {
     return (
       <form onSubmit={handleSubmit} className="event-form">
         <div className="container mt-3">
+        <div className="mb-3">
+            <label htmlFor="group" className="form-label">Select Group:</label>
+            <Select
+              value={selectedGroup}
+              options={groupOptions}
+              onChange={handleGroupSelect}
+            />
+          </div>
+
           <div className="mb-3">
             <label htmlFor="title" className="form-label">Title:</label>
             <input
@@ -89,7 +121,7 @@ const EventForm = () => {
               <input
                 type="text"
                 id="start_date"
-                value={start_date}
+                value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 placeholder="MM/DD/YY"
                 required
@@ -101,7 +133,7 @@ const EventForm = () => {
               <input
                 type="text"
                 id="start_time"
-                value={start_time}
+                value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 placeholder="HH:mm"
                 required
@@ -116,7 +148,7 @@ const EventForm = () => {
               <input
                 type="text"
                 id="end_date"
-                value={end_date}
+                value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 placeholder="MM/DD/YY"
                 required
@@ -128,7 +160,7 @@ const EventForm = () => {
               <input
                 type="text"
                 id="end_time"
-                value={end_time}
+                value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
                 placeholder="HH:mm"
                 required
@@ -146,21 +178,6 @@ const EventForm = () => {
               required
               className="form-control"
             />
-          </div>
-  
-          <div className="mb-3">
-            <label htmlFor="group" className="form-label">Select Group:</label>
-            <select
-              id="group"
-              value={selected_group}
-              onChange={(e) => setSelectedGroup(e.target.value)}
-              className="form-select"
-            >
-              <option value="" disabled>Select a group</option>
-              {groups.map((group, index) => (
-                <option key={index} value={group}>{group}</option>
-              ))}
-            </select>
           </div>
   
           <button type="submit" className="btn btn-primary">Submit</button>
