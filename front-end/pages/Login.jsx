@@ -122,7 +122,7 @@ export default function Login() {
                 {error && <div className="error-message">{error}</div>}
                 <p></p>
                 <div>
-                    <button type="submit">Log In</button>
+                    <button type="submit" className="btn btn-success">Log In</button>
                 </div>
             </form>
         </div>

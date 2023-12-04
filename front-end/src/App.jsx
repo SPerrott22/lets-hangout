@@ -61,7 +61,7 @@ function Header({tokenProp, tokenDeletion}) {
                     {location.pathname!=="/event_creation" && (<a className="nav-link" href="/event_creation">Create Event</a>)}
                   </li>
                   {tokenProp.token && (
-                    <button onClick={handleLogout} className="btn btn-secondary" type="button">
+                    <button onClick={handleLogout} className="btn btn-danger" type="button">
                       Logout
                     </button>)}
                   {!tokenProp.token && (
