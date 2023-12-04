@@ -15,9 +15,29 @@ import './App.css';
 import EventForm from '../pages/EventCreation';
 import { TokenContext } from '../context/TokenContext.jsx';
 import AccountCreation from '../pages/AccountCreation';
+import { useNavigate } from 'react-router-dom';
+
+function Header({tokenProp, tokenDeletion}) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate("/");
+    tokenDeletion(); // This will remove the token from localStorage and update the state
+  };
+
+  return <header className="App-header">
+    <a href="/">Let's Hangout!</a>
+    {tokenProp.token && (
+    <button onClick={handleLogout} className="logout-button">
+      Logout
+    </button>
+    )}
+  </header>
+}
 
 function App() {
   const { tokenInfo, deleteToken } = useContext(TokenContext);
+  
 
   // const [count, setCount] = useState(0)
 
@@ -55,9 +75,7 @@ function App() {
     }
     */
 
-    const handleLogout = () => {
-      deleteToken(); // This will remove the token from localStorage and update the state
-    };
+    
   
     // tokenInfo={tokenInfo}
     //setToken={setToken} tokenInfo={tokenInfo} 
@@ -66,14 +84,7 @@ function App() {
       // <TokenProvider>
       <BrowserRouter>
         <div className="App">
-          <header className="App-header">
-            <a href="/">Let's Hangout!</a>
-            {tokenInfo.token && (
-            <button onClick={handleLogout} className="logout-button">
-              Logout
-            </button>
-          )}
-          </header>
+            <Header tokenProp={tokenInfo} tokenDeletion={deleteToken}/>
             <Routes>
               <Route exact path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
