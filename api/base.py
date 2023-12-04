@@ -111,9 +111,11 @@ def get_users():
 
     # Filter by similar name if provided
     if search_name:
+        search_pattern = f'%{search_name}%'
         query = query.filter(db.or_(
-            User.first_name.ilike(f'%{search_name}%'), 
-            User.last_name.ilike(f'%{search_name}%')
+            User.first_name.ilike(search_pattern), 
+            User.last_name.ilike(search_pattern),
+            (User.first_name + " " + User.last_name).ilike(search_pattern)
         ))
 
     users_paginated = query.paginate(page=page, per_page=per_page, error_out=False)
@@ -125,6 +127,7 @@ def get_users():
         'pages': users_paginated.pages,
         'current_page': page
     }), 200
+
 
 # Routes
 @app.route('/user', methods=['POST'])
