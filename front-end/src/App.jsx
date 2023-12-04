@@ -14,7 +14,7 @@ import api from './api';
 import './App.css';
 import EventForm from '../pages/EventCreation';
 import { TokenContext } from '../context/TokenContext.jsx';
-
+import AccountCreation from '../pages/AccountCreation';
 
 function App() {
   const { tokenInfo, deleteToken } = useContext(TokenContext);
@@ -92,6 +92,7 @@ function App() {
                   <EventForm />
                 </RequireAuth>
               } /> 
+              <Route path = "/account" element = {<AccountCreation/>}/>
             </Routes>
           <ul>
             <li>
@@ -105,6 +106,9 @@ function App() {
             </li>
             <li>
               <Link to='/event_creation'>Event Creation</Link>
+            </li>
+            <li>
+              <Link to='/account'>Create Account</Link>
             </li>
           </ul>
         </div>
