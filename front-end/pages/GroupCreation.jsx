@@ -73,7 +73,8 @@ const GroupForm = () => {
     try {
       // Extract user IDs from selectedUsers
       const userIds = selectedUsers.map((user) => user.value);
-      console.log(selectedUsers);
+      userIds.push(tokenInfo.userId);
+      console.log(userIds);
 
       // Make a POST request to the backend route to create a group
       const response = await fetch('http://localhost:4000/group', {
