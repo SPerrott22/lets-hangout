@@ -36,11 +36,6 @@ const GroupForm = () => {
 
   const handleInputChange = (newValue) => {
     setSearchTerm(newValue);
-    /*
-    if (!newValue) {
-    }
-    */
-  
     fetchUsers(newValue);
   };
 
@@ -73,8 +68,6 @@ const GroupForm = () => {
     setSearchTerm('');
     setOptions([]);
   };
-  
-  
 
   const handleCreateGroup = async () => {
     try {
@@ -104,17 +97,23 @@ const GroupForm = () => {
       } else {
         const errorData = await response.json();
         console.error('Error creating group:', errorData.message);
+        setGroupCreated(false);
       }
     } catch (error) {
       console.error('Error creating group:', error.message);
+      setGroupCreated(false);
     }
+    setGroupName('');
+    setSelectedUsers([]);
+    setSearchTerm('');
+    setOptions([]);
   };
 
   return (
     <div>
       {groupCreated && <p>Group created successfully!</p>}
       <h2>Create Group</h2>
-      <input type='text' onChange={e => setGroupName(e.target.value)} />
+      <input type='text' value={groupName} onChange={e => setGroupName(e.target.value)} />
       <Select
         isMulti
         value={selectedUsers}
