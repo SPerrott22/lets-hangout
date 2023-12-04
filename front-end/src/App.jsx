@@ -15,6 +15,7 @@ import './App.css';
 import EventForm from '../pages/EventCreation';
 import { TokenContext } from '../context/TokenContext.jsx';
 import AccountCreation from '../pages/AccountCreation';
+import GroupForm from '../pages/GroupCreation';
 import { useNavigate } from 'react-router-dom';
 
 function Header({tokenProp, tokenDeletion}) {
@@ -103,6 +104,11 @@ function App() {
                   <EventForm />
                 </RequireAuth>
               } /> 
+              <Route path="/group_creation" element= {
+                <RequireAuth>
+                  <GroupForm />
+                </RequireAuth>
+              } /> 
               <Route path = "/account" element = {<AccountCreation/>}/>
             </Routes>
           <ul>
@@ -120,10 +126,13 @@ function App() {
             </li>
             {
               !tokenInfo.token && 
-                <li>
-                  <Link to='/account'>Create Account</Link>
-                </li>
+              <li>
+                <Link to='/account'>Create Account</Link>
+              </li>
             }
+            <li>
+              <Link to='/group_creation'>Group Creation</Link>
+            </li>
           </ul>
         </div>
       </BrowserRouter>

@@ -20,9 +20,9 @@ const EventForm = () => {
   const [end_date, setEndDate] = useState('');
   const [end_time, setEndTime] = useState('');
   const [description, setDescription] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState('');
+  const [selected_group, setSelectedGroup] = useState('');
   const [people, setPeople] = useState([]);
-  const [newPerson, setNewPerson] = useState('');
+  const [new_person, setNewPerson] = useState('');
 
   const groups = ['Group A', 'Group B', 'Group C']; // Add your group names here
 
@@ -31,10 +31,26 @@ const EventForm = () => {
     const startDateTime = moment(`${start_date} ${start_time}`, 'MM/DD/YY HH:mm');
     const endDateTime = moment(`${end_date} ${end_time}`, 'MM/DD/YY HH:mm');
 
-    console.log('Form submitted:', { title, startDateTime, endDateTime, description, selectedGroup });
+    console.log('Form submitted:', { title, startDateTime, endDateTime, description, selected_group });
 
     // You can perform further actions with the collected data here
     // For now, it's just logging the data to the console
+    /*
+    const start_string;
+    const end_string;
+
+    const event_data = {
+      title: title,
+      description: description,
+    }
+
+    const response = await fetch('http://localhost:4000/event', {
+      method: 'POST',
+      body: {
+
+      }
+    })
+    */
 
     // Clear form fields after submission
     setTitle('');
@@ -139,7 +155,7 @@ const EventForm = () => {
             <label htmlFor="group" className="form-label">Select Group:</label>
             <select
               id="group"
-              value={selectedGroup}
+              value={selected_group}
               onChange={(e) => setSelectedGroup(e.target.value)}
               className="form-select"
             >
