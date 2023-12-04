@@ -1,17 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import './EventCreation.css'; // Import the CSS file for styling
-
-const PeopleList = ({ people }) => (
-  <div className="container">
-    <h3>People in the Group:</h3>
-    <ul className="list-group">
-      {people.map((person, index) => (
-        <li key={index} className="list-group-item">{person}</li>
-      ))}
-    </ul>
-  </div>
-);
+import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
 
 const EventForm = () => {
   const [title, setTitle] = useState('');
@@ -21,8 +11,22 @@ const EventForm = () => {
   const [end_time, setEndTime] = useState('');
   const [description, setDescription] = useState('');
   const [selected_group, setSelectedGroup] = useState('');
-  const [people, setPeople] = useState([]);
-  const [new_person, setNewPerson] = useState('');
+  const [group, setGroup] = useState([]);
+
+  useEffect(() => {
+    // Fetch user's groups when the component mounts
+    const fetchGroups = async () => {
+      try {
+        const response = await fetch(`http://localhost:4000/user/${tokenInfo.userId}/groups`);
+        const data = await response.json();
+        setGroup(data);
+      } catch (error) {
+        console.error('Error fetching user groups:', error);
+      }
+    };
+
+    fetchGroups();
+  }, [tokenInfo.userId]); // Run this effect when the user ID changes
 
   const groups = ['Group A', 'Group B', 'Group C']; // Add your group names here
 
@@ -60,15 +64,6 @@ const EventForm = () => {
     setEndTime('');
     setDescription('');
     setSelectedGroup('');
-    setPeople([]);
-    setNewPerson('');
-  };
-
-  const handleAddPerson = () => {
-    if (newPerson.trim() !== '') {
-      setPeople([...people, newPerson]);
-      setNewPerson('');
-    }
   };
 
     return (
