@@ -97,8 +97,27 @@ def verify_password(email, password):
 def get_users():
     page = max(request.args.get('page', 1, type=int), 1)
     per_page = min(max(request.args.get('per_page', 10, type=int), 1), 100)
-    users_paginated = User.query.paginate(page=page, per_page=per_page, error_out=False)
-    users = [{'id': str(u.id), 'email': u.email} for u in users_paginated.items]
+
+    # Retrieve query parameters for email and name search
+    search_email = request.args.get('email', type=str)
+    search_name = request.args.get('name', type=str)
+
+    # Base query
+    query = User.query
+
+    # Filter by similar email if provided
+    if search_email:
+        query = query.filter(User.email.ilike(f'%{search_email}%'))
+
+    # Filter by similar name if provided
+    if search_name:
+        query = query.filter(db.or_(
+            User.first_name.ilike(f'%{search_name}%'), 
+            User.last_name.ilike(f'%{search_name}%')
+        ))
+
+    users_paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+    users = [{'id': str(u.id), 'email': u.email, 'first_name': u.first_name, 'last_name': u.last_name} for u in users_paginated.items]
 
     return jsonify({
         'users': users,
@@ -106,7 +125,6 @@ def get_users():
         'pages': users_paginated.pages,
         'current_page': page
     }), 200
-
 
 # Routes
 @app.route('/user', methods=['POST'])
