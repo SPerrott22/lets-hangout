@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import moment from 'moment';
 import './EventCreation.css'; // Import the CSS file for styling
 import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
@@ -12,6 +12,8 @@ const EventForm = () => {
   const [description, setDescription] = useState('');
   const [selected_group, setSelectedGroup] = useState('');
   const [group, setGroup] = useState([]);
+
+  const { tokenInfo, deleteToken } = useContext(TokenContext);
 
   useEffect(() => {
     // Fetch user's groups when the component mounts
