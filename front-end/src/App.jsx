@@ -107,9 +107,12 @@ function App() {
             <li>
               <Link to='/event_creation'>Event Creation</Link>
             </li>
-            <li>
-              <Link to='/account'>Create Account</Link>
-            </li>
+            {
+              !tokenInfo.token && 
+                <li>
+                  <Link to='/account'>Create Account</Link>
+                </li>
+            }
           </ul>
         </div>
       </BrowserRouter>
