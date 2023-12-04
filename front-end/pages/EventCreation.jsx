@@ -59,7 +59,7 @@ const EventForm = () => {
       <form onSubmit={handleSubmit} className="event-form">
         <div className="container mt-3">
           <div className="mb-3">
-            <label htmlFor="title" className="form-label">Title:</label>
+            <label htmlFor="title" className="form-label">Event Title:</label>
             <input
               type="text"
               id="title"
@@ -125,7 +125,7 @@ const EventForm = () => {
           </div>
   
           <div className="mb-3">
-            <label htmlFor="description" className="form-label">Description:</label>
+            <label htmlFor="description" className="form-label">Event Description:</label>
             <textarea
               id="description"
               value={description}
@@ -150,7 +150,7 @@ const EventForm = () => {
             </select>
           </div>
   
-          <button type="submit" className="btn btn-primary">Submit</button>
+          <button type="submit" className="btn btn-primary">Create Event</button>
         </div>
       </form>
     );

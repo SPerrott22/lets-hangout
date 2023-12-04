@@ -1,5 +1,5 @@
 .event-form {
-    max-width: 100%;
+    width: 600px;
     margin: 0 auto;
   }
   
@@ -19,10 +19,11 @@
     padding: 8px;
     margin-bottom: 8px;
     box-sizing: border-box;
+    border-radius: 10px;
   }
   
   .event-form button {
-    background-color: #4caf50;
+    background-color: #4bbf73;
     color: white;
     padding: 10px 15px;
     border: none;
