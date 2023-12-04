@@ -1,6 +1,8 @@
 import './Login.css';
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { TokenContext } from '../context/TokenContext.jsx'; // Ensure correct path
+
 
 async function loginUser(username, password) {
     const base64Credentials = btoa(username + ':' + password);
@@ -49,9 +51,10 @@ async function loginUser(username, password) {
 //     });
 // }
 
-import  { useEffect } from 'react';
+// import  { useEffect } from 'react';
+// { tokenInfo, setToken }
 
-export default function Login({ tokenInfo, setToken }) {
+export default function Login() {
     let navigate = useNavigate();
     let location = useLocation();
     let from = location.state?.from?.pathname || "/";
@@ -59,6 +62,7 @@ export default function Login({ tokenInfo, setToken }) {
     const [username, setUserName] = useState();
     const [password, setPassword] = useState();
     const [error, setError] = useState('');
+    const { setToken } = useContext(TokenContext);
 
     const handleSubmit = async e => {
         e.preventDefault();
