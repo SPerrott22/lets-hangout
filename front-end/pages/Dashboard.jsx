@@ -101,7 +101,8 @@ export default function Dashboard() {
             </div>
             {show && (
                 <div className="expandedEvent">
-                    <div className="xButton" onClick={() => onXClick()}></div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => onXClick()}></button>
+                    {/* <div className="xButton" onClick={() => onXClick()}></div> */}
                     <h2>{popup.title}</h2>
                     <p>{popup.time}</p>
                     <p>{popup.guests}</p>
