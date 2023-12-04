@@ -13,6 +13,7 @@ import api from './api';
 import useToken from './useToken';
 import './App.css';
 import EventForm from '../pages/EventCreation';
+import AccountCreation from '../pages/AccountCreation';
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -75,6 +76,7 @@ function App() {
                   <EventForm />
                 </RequireAuth>
               } /> 
+              <Route path = "/account" element = {<AccountCreation/>}/>
             </Routes>
           <ul>
             <li>
@@ -88,6 +90,9 @@ function App() {
             </li>
             <li>
               <Link to='/event_creation'>Event Creation</Link>
+            </li>
+            <li>
+              <Link to='/account'>Create Account</Link>
             </li>
           </ul>
         </div>
