@@ -55,32 +55,42 @@ const EventForm = () => {
 
   // const groups = ['Group A', 'Group B', 'Group C']; // Add your group names here
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+  
     const startDateTime = moment(`${startDate} ${startTime}`, 'MM/DD/YY HH:mm');
     const endDateTime = moment(`${endDate} ${endTime}`, 'MM/DD/YY HH:mm');
+  
+    const attendees = selectedGroup ? selectedGroup.value : null;
+  
+    try {
+      const response = await fetch('http://localhost:4000/event', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          group_id: selectedGroup.value,
+          title,
+          description,
+          time: startDateTime.format('YYYY-MM-DD HH:mm:ss'),
 
-    console.log('Form submitted:', { title, startDateTime, endDateTime, description, selectedGroup });
-
-    // You can perform further actions with the collected data here
-    // For now, it's just logging the data to the console
-    /*
-    const start_string;
-    const end_string;
-
-    const event_data = {
-      title: title,
-      description: description,
-    }
-
-    const response = await fetch('http://localhost:4000/event', {
-      method: 'POST',
-      body: {
-
+          //time: endDateTime.format('YYYY-MM-DD HH:mm:ss'),
+          attendees: attendees ? [attendees] : [],  // Pass as an array if it exists
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Event created successfully. Event ID:', data.id);
+      } else {
+        const errorData = await response.json();
+        console.error('Error creating event:', errorData.message);
       }
-    })
-    */
-
+    } catch (error) {
+      console.error('Error creating event:', error.message);
+    }
+  
     // Clear form fields after submission
     setTitle('');
     setStartDate('');
@@ -88,7 +98,7 @@ const EventForm = () => {
     setEndDate('');
     setEndTime('');
     setDescription('');
-    setSelectedGroup('');
+    setSelectedGroup(null);  // Reset selected group to null
   };
 
     return (
