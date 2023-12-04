@@ -3,7 +3,7 @@ import Select from 'react-select';
 import useToken from "../src/useToken";
 
 const GroupForm = () => {
-  // const [selectedUsers, setSelectedUsers] = useState([{value: "1234", label: "ash ketchum"}]);
+  const [groupName, setGroupName] = useState('');  
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [options, setOptions] = useState([]);
@@ -89,7 +89,7 @@ const GroupForm = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: "GroupNameEpic",
+          name: groupName,
           user_ids: userIds,
           creator_id: tokenInfo.userId
           // Additional data for group creation if needed
@@ -114,6 +114,7 @@ const GroupForm = () => {
     <div>
       {groupCreated && <p>Group created successfully!</p>}
       <h2>Create Group</h2>
+      <input type='text' onChange={e => setGroupName(e.target.value)} />
       <Select
         isMulti
         value={selectedUsers}
