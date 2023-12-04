@@ -3,11 +3,11 @@ import moment from 'moment';
 import './EventCreation.css'; // Import the CSS file for styling
 
 const PeopleList = ({ people }) => (
-  <div>
+  <div className="container">
     <h3>People in the Group:</h3>
-    <ul>
+    <ul className="list-group">
       {people.map((person, index) => (
-        <li key={index}>{person}</li>
+        <li key={index} className="list-group-item">{person}</li>
       ))}
     </ul>
   </div>
@@ -55,88 +55,105 @@ const EventForm = () => {
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="event-form">
-      <div>
-        <label htmlFor="title">Title:</label>
-        <input
-          type="text"
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor="start_date">Start Date:</label>
-        <input
-          type="text"
-          id="start_date"
-          value={start_date}
-          onChange={(e) => setStartDate(e.target.value)}
-          placeholder="MM/DD/YY"
-          required
-        />
-        <label htmlFor="start_time">Start Time:</label>
-        <input
-          type="text"
-          id="start_time"
-          value={start_time}
-          onChange={(e) => setStartTime(e.target.value)}
-          placeholder="HH:mm"
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor="end_date">End Date:</label>
-        <input
-          type="text"
-          id="end_date"
-          value={end_date}
-          onChange={(e) => setEndDate(e.target.value)}
-          placeholder="MM/DD/YY"
-          required
-        />
-        <label htmlFor="end_time">End Time:</label>
-        <input
-          type="text"
-          id="end_time"
-          value={end_time}
-          onChange={(e) => setEndTime(e.target.value)}
-          placeholder="HH:mm"
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor="description">Description:</label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor="group">Select Group:</label>
-        <select
-          id="group"
-          value={selectedGroup}
-          onChange={(e) => setSelectedGroup(e.target.value)}
-        >
-          <option value="" disabled>Select a group</option>
-          {groups.map((group, index) => (
-            <option key={index} value={group}>{group}</option>
-          ))}
-        </select>
-      </div>
-
-      <button type="submit">Submit</button>
-    </form>
-  );
+    return (
+      <form onSubmit={handleSubmit} className="event-form">
+        <div className="container mt-3">
+          <div className="mb-3">
+            <label htmlFor="title" className="form-label">Title:</label>
+            <input
+              type="text"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              className="form-control"
+            />
+          </div>
+  
+          <div className="row g-3 mb-3">
+            <div className="col">
+              <label htmlFor="start_date" className="form-label">Start Date:</label>
+              <input
+                type="text"
+                id="start_date"
+                value={start_date}
+                onChange={(e) => setStartDate(e.target.value)}
+                placeholder="MM/DD/YY"
+                required
+                className="form-control"
+              />
+            </div>
+            <div className="col">
+              <label htmlFor="start_time" className="form-label">Start Time:</label>
+              <input
+                type="text"
+                id="start_time"
+                value={start_time}
+                onChange={(e) => setStartTime(e.target.value)}
+                placeholder="HH:mm"
+                required
+                className="form-control"
+              />
+            </div>
+          </div>
+  
+          <div className="row g-3 mb-3">
+            <div className="col">
+              <label htmlFor="end_date" className="form-label">End Date:</label>
+              <input
+                type="text"
+                id="end_date"
+                value={end_date}
+                onChange={(e) => setEndDate(e.target.value)}
+                placeholder="MM/DD/YY"
+                required
+                className="form-control"
+              />
+            </div>
+            <div className="col">
+              <label htmlFor="end_time" className="form-label">End Time:</label>
+              <input
+                type="text"
+                id="end_time"
+                value={end_time}
+                onChange={(e) => setEndTime(e.target.value)}
+                placeholder="HH:mm"
+                required
+                className="form-control"
+              />
+            </div>
+          </div>
+  
+          <div className="mb-3">
+            <label htmlFor="description" className="form-label">Description:</label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              className="form-control"
+            />
+          </div>
+  
+          <div className="mb-3">
+            <label htmlFor="group" className="form-label">Select Group:</label>
+            <select
+              id="group"
+              value={selectedGroup}
+              onChange={(e) => setSelectedGroup(e.target.value)}
+              className="form-select"
+            >
+              <option value="" disabled>Select a group</option>
+              {groups.map((group, index) => (
+                <option key={index} value={group}>{group}</option>
+              ))}
+            </select>
+          </div>
+  
+          <button type="submit" className="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    );
 };
 
 export default EventForm;
