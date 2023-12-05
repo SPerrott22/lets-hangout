@@ -2,19 +2,21 @@
     text-align: center;
     position: relative; /* or absolute or fixed, depending on your layout */
     background-color: white;
+
+  }
+
+  .calendar-header {
+    background-color: white;
+    height: 10px;
+    color: white;
   }
   
-  .calendar-logo {
+  /* .calendar-logo {
     animation: App-logo-spin infinite 20s linear;
     height: 80px;
   }
   
-  .calendar-header {
-    background-color: #222;
-    height: 150px;
-    padding: 20px;
-    color: white;
-  }
+  
   
   .calendar-title {
     font-size: 1.5em;
@@ -27,4 +29,4 @@
   @keyframes App-logo-spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
-  }
+  } */
