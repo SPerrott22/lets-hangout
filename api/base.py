@@ -71,8 +71,8 @@ class Event(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     group_id = db.Column(db.BigInteger, db.ForeignKey('group.id'), nullable=False)
     title = db.Column(db.String(80), nullable=False)
-    description = db.Column(db.String(250))
-    time = db.Column(db.DateTime, nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)  # New start_time column
+    end_time = db.Column(db.DateTime, nullable=False)    # New end_time column
     # attendees = db.Column(MutableList.as_mutable(PickleType), default=[])
 
 # Create the database tables
@@ -181,6 +181,43 @@ def get_user_groups(user_id_str):
     result = [{'group_id': str(group.id), 'group_name': group.name} for group in user_groups]
 
     return jsonify(result), 200
+
+@app.route('/group/<string:group_id_str>/leave', methods=['POST'])
+@jwt_required()
+def leave_group(group_id_str):
+    try:
+        group_id = int(group_id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid group ID format"}), 400
+
+    try:
+        current_user_email = get_jwt_identity()
+        current_user = User.query.filter_by(email=current_user_email).first()
+        if not current_user:
+            return jsonify({"error": "User not found"}), 404
+
+        group = Group.query.get(group_id)
+        if not group:
+            return jsonify({"message": "Group not found"}), 404
+
+        if current_user not in group.users:
+            return jsonify({"message": "User is not a member of this group"}), 403
+
+        if current_user in group.admin_ids and len(group.admin_ids) == 1:
+            return jsonify({"message": "Cannot leave the group as the sole admin"}), 403
+
+        group.users.remove(current_user)
+        if current_user in group.admin_ids:
+            group.admin_ids.remove(current_user)
+
+        db.session.commit()
+        return jsonify({"message": "Successfully left the group"}), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': 'Database error: ' + str(e)}), 500
+
+
 
 # @app.route('/group', methods=['POST'])
 # def create_group():
@@ -401,11 +438,15 @@ def create_event():
     group_id = int(request.json.get('group_id'))
     title = request.json.get('title')
     description = request.json.get('description')
-    time_str = request.json.get('time')  # Get the time as a string
+    
+    # Convert start_time and end_time strings to datetime objects
+    start_time_str = request.json.get('start_time')
+    end_time_str = request.json.get('end_time')
+    start_time = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
+    end_time = datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
+    start_time = pytz.utc.localize(start_time)
+    end_time = pytz.utc.localize(end_time)
 
-    # Convert the time string to a datetime object and localize it to UTC
-    event_time = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
-    event_time = pytz.utc.localize(event_time)
     attendees = [int(user_id) for user_id in request.json.get('attendees', [])]  # Expecting a JSON array of user IDs
 
     valid, invalid_id = validate_users(attendees)
@@ -422,7 +463,8 @@ def create_event():
     if current_user not in group.admin_ids:
         return jsonify({'message': 'Only admins can create events for this group'}), 403
 
-    new_event = Event(group_id=group_id, title=title, description=description, time=event_time)
+    new_event = Event(group_id=group_id, title=title, description=description, 
+                      start_time=start_time, end_time=end_time)
     db.session.add(new_event)
 
     for user_id in attendees:
@@ -431,68 +473,76 @@ def create_event():
     db.session.commit()
     return jsonify({'id': str(new_event.id)}), 201
 
-@app.route('/event/<string:event_id_str>', endpoint='update_event', methods=['PUT'])
+from flask import jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy.exc import SQLAlchemyError
+import pytz
+from datetime import datetime
+
+@app.route('/event/<string:event_id_str>', methods=['PUT'])
 @jwt_required()
 def update_event(event_id_str):
     try:
         event_id = int(event_id_str)
     except ValueError:
         return jsonify({"error": "Invalid event ID format"}), 400
-    event = Event.query.get_or_404(event_id)
-    group = Group.query.get_or_404(event.group_id)  # Get the group of the event
-    current_user_email = get_jwt_identity()  # Assuming request.user is a User instance
-    current_user = User.query.filter_by(email=current_user_email).first()
 
-    if current_user not in group.admin_ids:
-        return jsonify({'message': 'Only admins of this group can update its events'}), 403
+    try:
+        event = Event.query.get_or_404(event_id)
+        group = Group.query.get_or_404(event.group_id)
 
-    data = request.json
-    title = data.get('title')
-    description = data.get('description')
-    attendee_ids = [int(user_id) for user_id in request.json.get('attendees', [])]  # Expecting a JSON array of user IDs
+        current_user_email = get_jwt_identity()
+        current_user = User.query.filter_by(email=current_user_email).first()
 
-    # Update title if provided
-    if title is not None:
-        event.title = title
+        if current_user not in group.users:
+            return jsonify({'message': 'User is not a member of this group'}), 403
 
-    # Update description if provided
-    if description is not None:
-        event.description = description
+        data = request.json
+        is_admin = current_user in group.admin_ids
 
-    # Update attendees if provided
-    if attendee_ids is not None:
-        if not isinstance(attendee_ids, list):
-            return jsonify({'message': 'Attendees must be a list'}), 400
+        if is_admin:
+            # Admin updating event details
+            title = data.get('title')
+            description = data.get('description')
+            start_time_str = data.get('start_time')
+            end_time_str = data.get('end_time')
 
-        # Remove existing attendees
-        for attendee in event.attendees:
-            event.attendees.remove(attendee)
+            if title is not None:
+                event.title = title
+            if description is not None:
+                event.description = description
+            if start_time_str:
+                event.start_time = pytz.utc.localize(datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S'))
+            if end_time_str:
+                event.end_time = pytz.utc.localize(datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S'))
 
+            if 'attendees' in data:
+                attendee_ids = set(data['attendees'])
+                valid_users = User.query.filter(User.id.in_(attendee_ids)).all()
+                if len(valid_users) != len(attendee_ids):
+                    return jsonify({'message': 'Invalid attendee IDs'}), 400
 
-        for attendee_id in attendee_ids:
-            if attendee := User.query.get(int(attendee_id)):
-                event.attendees.append(attendee)
+                valid_group_members = [user for user in valid_users if group in user.groups]
+                if len(valid_group_members) != len(attendee_ids):
+                    return jsonify({'message': 'Some attendees are not in the group'}), 400
+
+                event.attendees = valid_group_members
+
+        elif 'attendees' in data and len(data) == 1 and current_user.id in data['attendees']:
+            # User RSVP'ing to event
+            if current_user in event.attendees:
+                event.attendees.remove(current_user)
             else:
-                return jsonify({'message': f'Invalid attendee ID: {str(attendee_id)}'}), 404
-    # event.title = request.json.get('title', event.title)
-    # event.description = request.json.get('description', event.description)
-    # attendee_ids = request.json.get('attendees', [])
-    # if not isinstance(attendee_ids, list):
-    #     return jsonify({'message': 'Attendees must be a list'}), 400
+                event.attendees.append(current_user)
+        else:
+            return jsonify({'message': 'Permission denied'}), 403
 
-    # attendees = request.json.get('attendees', event.attendees)
+        db.session.commit()
+        return jsonify({'id': str(event.id)}), 200
 
-    # valid, invalid_id = validate_users(attendees)
-    # if not valid:
-    #     return jsonify({'message': f'Invalid attendee ID: {invalid_id}'}), 404
-
-    # if not isinstance(attendees, list):
-    #     return jsonify({'message': 'Attendees must be a list'}), 400
-
-    # event.attendees = attendees
-
-    db.session.commit()
-    return jsonify({'id': str(event.id)}), 200
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/group/<string:group_id_str>/add_users', methods=['PUT'])
@@ -564,7 +614,8 @@ def get_user_groups_events(user_id_str):
                 'event_id': str(event.id),
                 'title': event.title,
                 'description': event.description,
-                'time': event.time.strftime('%Y-%m-%d %H:%M:%S'),
+                'start_time': event.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'end_time': event.end_time.strftime('%Y-%m-%d %H:%M:%S'),
                 'attendees': [{'id': str(attendee.id), 'email': str(attendee.email)} for attendee in event.attendees]
             }
 
@@ -632,7 +683,8 @@ def get_group_events(group_id_str):
             'event_id': str(event.id),
             'title': event.title,
             'description': event.description,
-            'time': event.time.strftime('%Y-%m-%d %H:%M:%S')
+            'start_time': event.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'end_time': event.end_time.strftime('%Y-%m-%d %H:%M:%S')
         }
 
         if 'full' in request.args and request.args['full'].lower() == 'true':
