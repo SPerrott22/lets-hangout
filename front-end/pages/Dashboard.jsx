@@ -3,14 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
 import './Dashboard.css';
 
-function EventBlock({ title, time, attendees, description, handleClick }) {
+function EventBlock({ title, time, attendees, handleClick, blurred}) {
     let guest_string = attendees ? attendees.map(attendee => attendee.email).join(", ") : "";
 
     return (
-        <div className="eventBlock" onClick={handleClick}>
-            <div className="eventTitle">{title}</div>
-            <p>{time}</p>
-            <div className="eventGuests">{guest_string}</div>
+        <div>
+            {!blurred && ( <div className="eventBlock" onClick={handleClick}>
+                <div className="eventTitle">{title}</div>
+                <p>{time}</p>
+                <div className="eventGuests">{guest_string}</div>
+            </div> )}
+            {blurred && ( <div className="eventBlockBlurred" onClick={handleClick}>
+                <div className="eventTitle">{title}</div>
+                <p>{time}</p>
+                <div className="eventGuests">{guest_string}</div>
+            </div> )}
         </div>
     );
 }
@@ -86,18 +93,23 @@ export default function Dashboard() {
             attendees={event.attendees}
             description={event.description}
             handleClick={() => onEventClick(event.title, event.time, event.attendees, event.description)}
+            blurred={show}
         />
     ));
 
     return (
         <div className="dashboard">
-            <div className="search-bar">
-                <input
+            <div className="d-flex">
+                {show && (<div class="form-control me-sm-2">
+                {' '}</div>)}
+                {!show &&  (<input
+                    class="form-control me-sm-2"
                     type="text"
                     placeholder="Search events..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
+                    onChange={(e) => setSearchQuery(e.target.value)}>
+                </input>)}
+
             </div>
             {show && (
                 <div className="expandedEvent">
