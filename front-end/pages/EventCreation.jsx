@@ -80,7 +80,6 @@ const EventForm = () => {
     const startDateTime = startDate.concat(' ', startTime);
     const endDateTime = endDate.concat(' ', endTime);
 
-    /*
     try {
       const response = await fetch('http://localhost:4000/event', {
         method: 'POST',
@@ -92,9 +91,8 @@ const EventForm = () => {
           group_id: selectedGroup.value,
           title,
           description,
-          time: startDateTime.format('YYYY-MM-DD HH:mm:ss'),
-
-          //time: endDateTime.format('YYYY-MM-DD HH:mm:ss'),
+          start_time: startDateTime,
+          end_time: endDateTime,
           attendees
         }),
       });
@@ -109,7 +107,6 @@ const EventForm = () => {
     } catch (error) {
       console.error('Error creating event:', error.message);
     }
-    */
   
     // Clear form fields after submission
     setTitle('');
