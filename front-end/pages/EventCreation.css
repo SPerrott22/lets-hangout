@@ -5,9 +5,13 @@
   
   
 .event-form input, 
-.event-form textarea,
-.event-form select {
+.event-form textarea{
   border-radius: 10px;
+}
+
+.form-control {
+  border-radius: 10px;
+  /* height: 3.8em; */
 }
   
 .event-form button {

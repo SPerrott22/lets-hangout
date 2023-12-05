@@ -122,12 +122,13 @@ const EventForm = () => {
     return (
       <form onSubmit={handleSubmit} className="event-form">
         <div className="container mt-3">
-        <div className="mb-3">
+          <div className="mb-3">
             <label htmlFor="group" className="form-label">Select Group:</label>
             <Select
               value={selectedGroup}
               options={groupOptions}
               onChange={handleGroupSelect}
+              className="form-control"
             />
           </div>
 

@@ -101,9 +101,9 @@ export default function Dashboard() {
         <div className="dashboard">
             <div className="d-flex">
                 {show && (<div class="form-control me-sm-2">
-                {' '}</div>)}
+                </div>)}
                 {!show &&  (<input
-                    class="form-control me-sm-2"
+                    className="form-control me-sm-2"
                     type="text"
                     placeholder="Search events..."
                     value={searchQuery}
@@ -114,7 +114,6 @@ export default function Dashboard() {
             {show && (
                 <div className="expandedEvent">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => onXClick()}></button>
-                    {/* <div className="xButton" onClick={() => onXClick()}></div> */}
                     <h2>{popup.title}</h2>
                     <p>{popup.time}</p>
                     <p>{popup.guests}</p>
