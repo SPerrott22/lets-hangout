@@ -14,6 +14,7 @@ from datetime import datetime
 # from sqlalchemy import PickleType
 import argon2
 from argon2 import PasswordHasher
+from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
 CORS(app)
@@ -71,6 +72,7 @@ class Event(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     group_id = db.Column(db.BigInteger, db.ForeignKey('group.id'), nullable=False)
     title = db.Column(db.String(80), nullable=False)
+    description = db.Column(db.String(1000))
     start_time = db.Column(db.DateTime, nullable=False)  # New start_time column
     end_time = db.Column(db.DateTime, nullable=False)    # New end_time column
     # attendees = db.Column(MutableList.as_mutable(PickleType), default=[])
@@ -113,7 +115,7 @@ def get_users():
     if search_name:
         search_pattern = f'%{search_name}%'
         query = query.filter(db.or_(
-            User.first_name.ilike(search_pattern), 
+            User.first_name.ilike(search_pattern),
             User.last_name.ilike(search_pattern),
             (User.first_name + " " + User.last_name).ilike(search_pattern)
         ))
@@ -159,7 +161,7 @@ def get_user(user_id_str):
     user_groups = Group.query.filter(Group.users.any(id=user_id)).all()
     groups = [{'group_id': str(group.id), 'group_name': group.name} for group in user_groups]
 
-    
+
     return jsonify({
         'email': user.email,
         'first_name': user.first_name,
@@ -232,7 +234,7 @@ def leave_group(group_id_str):
 
 #     if not (admin := User.query.get(creator_id)):
 #         return jsonify({'message': 'Creator user does not exist'}), 404
-        
+
 
 #     new_group = Group(name=name)
 #     db.session.add(new_group)
@@ -302,7 +304,7 @@ def add_admin_to_group(group_id_str):
     except ValueError:
         return jsonify({"error": "Invalid group ID format"}), 400
     admin_id_to_add = request.json.get('admin_id')
-    
+
     # Validate admin_id_to_add
     if not isinstance(admin_id_to_add, int):
         return jsonify({'message': 'Invalid admin ID'}), 400
@@ -337,7 +339,7 @@ def add_admin_to_group(group_id_str):
 #         return jsonify({"error": "Invalid group ID format"}), 400
 
 #     admin_id_to_add = request.json.get('admin_id')
-    
+
 #     # Validate admin_id_to_add
 #     if not isinstance(admin_id_to_add, int):
 #         return jsonify({'message': 'Invalid admin ID'}), 400
@@ -370,14 +372,14 @@ def remove_admin_from_group(group_id_str):
         return jsonify({"error": "Invalid group ID format"}), 400
 
     admin_id_to_remove = request.json.get('admin_id')
-    
+
     # Validate admin_id_to_remove
     if not isinstance(admin_id_to_remove, int):
         return jsonify({'message': 'Invalid admin ID'}), 400
 
     group = Group.query.get_or_404(group_id)
     admin_to_remove = User.query.get_or_404(admin_id_to_remove, description="Admin to remove does not exist")
-    
+
     current_user_email = get_jwt_identity()  # Assuming request.user is a User instance
     current_user = User.query.filter_by(email=current_user_email).first()
 
@@ -392,7 +394,7 @@ def remove_admin_from_group(group_id_str):
     # Remove the user as an admin
     group.admin_ids.remove(admin_to_remove)
     db.session.commit()
-    
+
     return jsonify({'message': 'Admin removed from the group'}), 200
 
 # @app.route('/group/<string:group_id_str>/remove_admin', methods=['PUT'])
@@ -403,7 +405,7 @@ def remove_admin_from_group(group_id_str):
 #         return jsonify({"error": "Invalid group ID format"}), 400
 
 #     admin_id_to_remove = request.json.get('admin_id')
-    
+
 #     # Validate admin_id_to_remove
 #     if not isinstance(admin_id_to_remove, int):
 #         return jsonify({'message': 'Invalid admin ID'}), 400
@@ -438,12 +440,12 @@ def create_event():
     group_id = int(request.json.get('group_id'))
     title = request.json.get('title')
     description = request.json.get('description')
-    
+
     # Convert start_time and end_time strings to datetime objects
     start_time_str = request.json.get('start_time')
     end_time_str = request.json.get('end_time')
-    start_time = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
-    end_time = datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
+    start_time = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M')
+    end_time = datetime.strptime(end_time_str, '%Y-%m-%d %H:%M')
     start_time = pytz.utc.localize(start_time)
     end_time = pytz.utc.localize(end_time)
 
@@ -463,7 +465,7 @@ def create_event():
     if current_user not in group.admin_ids:
         return jsonify({'message': 'Only admins can create events for this group'}), 403
 
-    new_event = Event(group_id=group_id, title=title, description=description, 
+    new_event = Event(group_id=group_id, title=title, description=description,
                       start_time=start_time, end_time=end_time)
     db.session.add(new_event)
 
@@ -472,12 +474,6 @@ def create_event():
 
     db.session.commit()
     return jsonify({'id': str(new_event.id)}), 201
-
-from flask import jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy.exc import SQLAlchemyError
-import pytz
-from datetime import datetime
 
 @app.route('/event/<string:event_id_str>', methods=['PUT'])
 @jwt_required()
@@ -512,9 +508,9 @@ def update_event(event_id_str):
             if description is not None:
                 event.description = description
             if start_time_str:
-                event.start_time = pytz.utc.localize(datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S'))
+                event.start_time = pytz.utc.localize(datetime.strptime(start_time_str, '%Y-%m-%d %H:%M'))
             if end_time_str:
-                event.end_time = pytz.utc.localize(datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S'))
+                event.end_time = pytz.utc.localize(datetime.strptime(end_time_str, '%Y-%m-%d %H:%M'))
 
             if 'attendees' in data:
                 attendee_ids = set(data['attendees'])
@@ -554,7 +550,7 @@ def add_users_to_group(group_id_str):
     group = Group.query.get_or_404(group_id)
     user_ids = request.json.get('user_ids')
 
-    current_user_ids = {user.id for user in group.users}  
+    current_user_ids = {user.id for user in group.users}
     new_users_added = False
 
     for user_id in user_ids:
@@ -605,7 +601,7 @@ def get_user_groups_events(user_id_str):
 
     if current_user != user:
         return jsonify({'message': 'Permission denied'}), 403
-    
+
     result = []
     for group in user.groups:
         group_info = {'group_id': str(group.id), 'group_name': group.name, 'events': []}
@@ -614,8 +610,8 @@ def get_user_groups_events(user_id_str):
                 'event_id': str(event.id),
                 'title': event.title,
                 'description': event.description,
-                'start_time': event.start_time.strftime('%Y-%m-%d %H:%M:%S'),
-                'end_time': event.end_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'start_time': event.start_time.strftime('%Y-%m-%d %H:%M'),
+                'end_time': event.end_time.strftime('%Y-%m-%d %H:%M'),
                 'attendees': [{'id': str(attendee.id), 'email': str(attendee.email)} for attendee in event.attendees]
             }
 
@@ -645,7 +641,7 @@ def get_user_groups_events(user_id_str):
     #             'event_id': event.id,
     #             'title': event.title,
     #             'description': event.description,
-    #             'time': event.time.strftime('%Y-%m-%d %H:%M:%S'),
+    #             'time': event.time.strftime('%Y-%m-%d %H:%M'),
     #             'attendees': []
     #         }
 
@@ -672,7 +668,7 @@ def get_group_events(group_id_str):
         group_id = int(group_id_str)
     except ValueError:
         return jsonify({"error": "Invalid group ID format"}), 400
-    
+
     group = Group.query.get_or_404(group_id)
 
     events = Event.query.filter_by(group_id=group.id).all()
@@ -683,8 +679,8 @@ def get_group_events(group_id_str):
             'event_id': str(event.id),
             'title': event.title,
             'description': event.description,
-            'start_time': event.start_time.strftime('%Y-%m-%d %H:%M:%S'),
-            'end_time': event.end_time.strftime('%Y-%m-%d %H:%M:%S')
+            'start_time': event.start_time.strftime('%Y-%m-%d %H:%M'),
+            'end_time': event.end_time.strftime('%Y-%m-%d %H:%M')
         }
 
         if 'full' in request.args and request.args['full'].lower() == 'true':
@@ -711,7 +707,7 @@ def get_group_events(group_id_str):
     #             'event_id': event.id,
     #             'title': event.title,
     #             'description': event.description,
-    #             'time': event.time.strftime('%Y-%m-%d %H:%M:%S'),
+    #             'time': event.time.strftime('%Y-%m-%d %H:%M'),
     #             'attendees': []
     #         }
 
@@ -741,6 +737,3 @@ def login():
     return jsonify({"error": "Invalid username or password"}), 401
   except Exception as e:
     return jsonify({"error": str(e)}), 500
-
-
-  
