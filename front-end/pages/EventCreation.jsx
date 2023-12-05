@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Select from 'react-select';
-import moment from 'moment';
 import './EventCreation.css'; // Import the CSS file for styling
 import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
 import { useNavigate } from 'react-router-dom';
@@ -75,11 +74,13 @@ const EventForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    const startDateTime = moment(`${startDate} ${startTime}`, 'MM/DD/YY HH:mm');
-    const endDateTime = moment(`${endDate} ${endTime}`, 'MM/DD/YY HH:mm');
+
     const attendees = [];
 
+    const startDateTime = startDate.concat(' ', startTime);
+    const endDateTime = endDate.concat(' ', endTime);
+
+    /*
     try {
       const response = await fetch('http://localhost:4000/event', {
         method: 'POST',
@@ -108,6 +109,7 @@ const EventForm = () => {
     } catch (error) {
       console.error('Error creating event:', error.message);
     }
+    */
   
     // Clear form fields after submission
     setTitle('');
@@ -148,7 +150,7 @@ const EventForm = () => {
             <div className="col">
               <label htmlFor="start_date" className="form-label">Start Date:</label>
               <input
-                type="text"
+                type="date"
                 id="start_date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
@@ -160,7 +162,7 @@ const EventForm = () => {
             <div className="col">
               <label htmlFor="start_time" className="form-label">Start Time:</label>
               <input
-                type="text"
+                type="time"
                 id="start_time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
@@ -175,7 +177,7 @@ const EventForm = () => {
             <div className="col">
               <label htmlFor="end_date" className="form-label">End Date:</label>
               <input
-                type="text"
+                type="date"
                 id="end_date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
@@ -187,7 +189,7 @@ const EventForm = () => {
             <div className="col">
               <label htmlFor="end_time" className="form-label">End Time:</label>
               <input
-                type="text"
+                type="time"
                 id="end_time"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
