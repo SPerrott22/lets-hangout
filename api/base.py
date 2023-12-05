@@ -71,8 +71,8 @@ class Event(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     group_id = db.Column(db.BigInteger, db.ForeignKey('group.id'), nullable=False)
     title = db.Column(db.String(80), nullable=False)
-    description = db.Column(db.String(250))
-    time = db.Column(db.DateTime, nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)  # New start_time column
+    end_time = db.Column(db.DateTime, nullable=False)    # New end_time column
     # attendees = db.Column(MutableList.as_mutable(PickleType), default=[])
 
 # Create the database tables
@@ -401,11 +401,15 @@ def create_event():
     group_id = int(request.json.get('group_id'))
     title = request.json.get('title')
     description = request.json.get('description')
-    time_str = request.json.get('time')  # Get the time as a string
+    
+    # Convert start_time and end_time strings to datetime objects
+    start_time_str = request.json.get('start_time')
+    end_time_str = request.json.get('end_time')
+    start_time = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
+    end_time = datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
+    start_time = pytz.utc.localize(start_time)
+    end_time = pytz.utc.localize(end_time)
 
-    # Convert the time string to a datetime object and localize it to UTC
-    event_time = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
-    event_time = pytz.utc.localize(event_time)
     attendees = [int(user_id) for user_id in request.json.get('attendees', [])]  # Expecting a JSON array of user IDs
 
     valid, invalid_id = validate_users(attendees)
@@ -422,7 +426,8 @@ def create_event():
     if current_user not in group.admin_ids:
         return jsonify({'message': 'Only admins can create events for this group'}), 403
 
-    new_event = Event(group_id=group_id, title=title, description=description, time=event_time)
+    new_event = Event(group_id=group_id, title=title, description=description, 
+                      start_time=start_time, end_time=end_time)
     db.session.add(new_event)
 
     for user_id in attendees:
@@ -450,6 +455,15 @@ def update_event(event_id_str):
     title = data.get('title')
     description = data.get('description')
     attendee_ids = [int(user_id) for user_id in request.json.get('attendees', [])]  # Expecting a JSON array of user IDs
+
+    start_time_str = data.get('start_time')
+    end_time_str = data.get('end_time')
+    if start_time_str:
+        event.start_time = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
+        event.start_time = pytz.utc.localize(event.start_time)
+    if end_time_str:
+        event.end_time = datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
+        event.end_time = pytz.utc.localize(event.end_time)
 
     # Update title if provided
     if title is not None:
@@ -564,7 +578,8 @@ def get_user_groups_events(user_id_str):
                 'event_id': str(event.id),
                 'title': event.title,
                 'description': event.description,
-                'time': event.time.strftime('%Y-%m-%d %H:%M:%S'),
+                'start_time': event.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'end_time': event.end_time.strftime('%Y-%m-%d %H:%M:%S'),
                 'attendees': [{'id': str(attendee.id), 'email': str(attendee.email)} for attendee in event.attendees]
             }
 
@@ -632,7 +647,8 @@ def get_group_events(group_id_str):
             'event_id': str(event.id),
             'title': event.title,
             'description': event.description,
-            'time': event.time.strftime('%Y-%m-%d %H:%M:%S')
+            'start_time': event.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'end_time': event.end_time.strftime('%Y-%m-%d %H:%M:%S')
         }
 
         if 'full' in request.args and request.args['full'].lower() == 'true':
