@@ -103,20 +103,26 @@ export default function Login() {
 
 
     return (
-        <div className="login-wrapper">
+        <div className="login-form">
+            <p></p>
             <h1>Please Log In</h1>
-            {error && <div className="error-message">{error}</div>}
             <form onSubmit={handleSubmit}>
-                <label>
-                    <p>Username</p>
-                <input type="text" onChange={e => setUserName(e.target.value)} />
-                </label>
-                <label>
-                    <p>Password</p>
-                    <input type="password" onChange={e => setPassword(e.target.value)} />
-                </label>
+                <div className="row g-3 mb-3">
+                    <div className="col">
+                        <label htmlFor="username" className="form-label">Username</label>
+                        <input id="username" type="text" onChange={e => setUserName(e.target.value)} required className="form-control"/>
+                    </div>
+                    <div className="col">
+                        <label htmlFor="password" className="form-label">Password</label>
+                        <input id="password" type="password" onChange={e => setPassword(e.target.value)} required className="form-control"/>
+                    </div>
+                </div>
+                <p></p>
+                {!error && <p></p>}
+                {error && <div className="error-message">{error}</div>}
+                <p></p>
                 <div>
-                    <button type="submit">Submit</button>
+                    <button type="submit" className="btn btn-success">Log In</button>
                 </div>
             </form>
         </div>

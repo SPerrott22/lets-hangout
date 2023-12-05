@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { redirect, Navigate } from 'react-router-dom';
+import "./AccountCreation.css";
 
 
 const AccountCreation = () => {
@@ -63,57 +64,63 @@ const AccountCreation = () => {
   };
 
   return (
-    <div>
-      {
-        user && <Navigate to="/login" replace={true} />
-      }
-      <h2>Create an Account</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+      <form onSubmit={handleSubmit} className="account-form">
+        {
+          user && <Navigate to="/login" replace={true}/>
+        }
+        <p></p>
+        <h2>Create an Account</h2>
+        <div className="container mt-3">
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">Email:</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="form-control"
+            />
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="firstName" className="form-label">First Name:</label>
+            <input
+              type="text"
+              id="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+              className="form-control"
+            />
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="lastName" className="form-label">Last Name:</label>
+            <input
+              type="text"
+              id="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+              className="form-control"
+            />
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">Password:</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="form-control"
           />
-        </div>
-        <div>
-          <label htmlFor="firstName">First Name:</label>
-          <input
-            type="text"
-            id="firstName"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="lastName">Last Name:</label>
-          <input
-            type="text"
-            id="lastName"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <button type="submit">Create Account</button>
+          </div>
+          <button type="submit" className="btn btn-primary">Create Account</button>
         </div>
       </form>
-    </div>
   );
 };
 

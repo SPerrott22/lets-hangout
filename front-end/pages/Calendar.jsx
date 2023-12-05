@@ -76,15 +76,16 @@ const MyCalendar = () => {
   // ];
 
   return (
-    <div className="calendar">
-      <Calendar
-        localizer={localizer}
-        defaultDate={new Date()}
-        defaultView="month"
-        events={formatEvents()}
-        style={{ height: "100vh" }}
-      />
-    </div>
+      <div className="calendar">
+        <div className="calendar-header"></div>
+        <Calendar
+          localizer={localizer}
+          defaultDate={new Date()}
+          defaultView="month"
+          events={formatEvents()}
+          style={{ height: "100vh" }}
+        />
+      </div>
   );
 }
 

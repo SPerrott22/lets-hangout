@@ -1,5 +1,13 @@
-.login-wrapper {
+.login-form {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.login-form input {
+    border-radius: 10px;
+}
+
+.login-form button {
+    margin-top: 15px;
 }

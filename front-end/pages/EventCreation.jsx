@@ -134,7 +134,7 @@ const EventForm = () => {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="title" className="form-label">Title:</label>
+            <label htmlFor="title" className="form-label">Event Title:</label>
             <input
               type="text"
               id="title"
@@ -200,7 +200,7 @@ const EventForm = () => {
           </div>
   
           <div className="mb-3">
-            <label htmlFor="description" className="form-label">Description:</label>
+            <label htmlFor="description" className="form-label">Event Description:</label>
             <textarea
               id="description"
               value={description}
@@ -210,8 +210,21 @@ const EventForm = () => {
               maxLength="250"
             />
           </div>
-  
-          <button type="submit" className="btn btn-primary">Submit</button>
+          <div className="mb-3">
+            <label htmlFor="group" className="form-label">Select Group:</label>
+            <select
+              id="group"
+              value={selectedGroup}
+              onChange={(e) => setSelectedGroup(e.target.value)}
+              className="form-select"
+            >
+              <option value="" disabled>Select a group</option>
+              {groups.map((group, index) => (
+                <option key={index} value={group}>{group}</option>
+              ))}
+            </select>
+          </div>
+          <button type="submit" className="btn btn-primary">Create Event</button>
         </div>
       </form>
     );

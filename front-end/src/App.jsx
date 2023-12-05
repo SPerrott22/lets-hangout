@@ -17,9 +17,12 @@ import { TokenContext } from '../context/TokenContext.jsx';
 import AccountCreation from '../pages/AccountCreation';
 import GroupForm from '../pages/GroupCreation';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from "react-router-dom"
 
 function Header({tokenProp, tokenDeletion}) {
   const navigate = useNavigate();
+  const location = useLocation();
+  
 
   const handleLogout = () => {
     navigate("/");
@@ -27,12 +30,51 @@ function Header({tokenProp, tokenDeletion}) {
   };
 
   return <header className="App-header">
-    <a href="/">Let's Hangout!</a>
+    {/* <a href="/">Let's Hangout!</a>
     {tokenProp.token && (
     <button onClick={handleLogout} className="logout-button">
       Logout
     </button>
-    )}
+    )} */}
+    
+    <nav className="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+      <div className="container-fluid">
+          <a className="navbar-brand" href="/">Let's Hangout!</a>
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+              <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className="collapse navbar-collapse" id="navbarColor01">
+              <ul className="navbar-nav me-auto">
+                  <li className="nav-item">
+                    {location.pathname==="/" && (<a className="nav-link active" href="/">Home</a>)}
+                    {location.pathname!=="/" && (<a className="nav-link" href="/">Home</a>)}
+                  </li>
+                  <li className="nav-item">
+                    {location.pathname==="/dashboard" && (<a className="nav-link active" href="/dashboard">Dashboard</a>)}
+                    {location.pathname!=="/dashboard" && (<a className="nav-link" href="/dashboard">Dashboard</a>)}
+                  </li>
+                  <li className="nav-item">
+                    {location.pathname==="/calendar" && (<a className="nav-link active" href="/calendar">Calendar</a>)}
+                    {location.pathname!=="/calendar" && (<a className="nav-link" href="/calendar">Calendar</a>)}
+                  </li>
+                  <li className="nav-item">
+                    {location.pathname==="/event_creation" && (<a className="nav-link active" href="/event_creation">Create Event</a>)}
+                    {location.pathname!=="/event_creation" && (<a className="nav-link" href="/event_creation">Create Event</a>)}
+                  </li>
+                  {tokenProp.token && (
+                    <button onClick={handleLogout} className="btn btn-danger" type="button">
+                      Logout
+                    </button>)}
+                  {!tokenProp.token && (
+                    <li className="nav-item">
+                      {location.pathname==="/account" && (<a className="nav-link active" href="/account">Create Account</a>)}
+                      {location.pathname!=="/account" && (<a className="nav-link" href="/account">Create Account</a>)}
+                    </li>
+                  )}
+              </ul>
+          </div>
+      </div>
+    </nav>
   </header>
 }
 
@@ -111,29 +153,6 @@ function App() {
               } /> 
               <Route path = "/account" element = {<AccountCreation/>}/>
             </Routes>
-          <ul>
-            <li>
-              <Link to='/'>Home</Link>
-            </li>
-            <li>
-              <Link to='/dashboard'>Dashboard</Link>
-            </li>
-            <li>
-              <Link to='/calendar'>Calendar</Link>
-            </li>
-            <li>
-              <Link to='/event_creation'>Event Creation</Link>
-            </li>
-            {
-              !tokenInfo.token && 
-              <li>
-                <Link to='/account'>Create Account</Link>
-              </li>
-            }
-            <li>
-              <Link to='/group_creation'>Group Creation</Link>
-            </li>
-          </ul>
         </div>
       </BrowserRouter>
       // </TokenProvider>

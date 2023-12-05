@@ -3,14 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
 import './Dashboard.css';
 
-function EventBlock({ title, time, attendees, description, handleClick }) {
+function EventBlock({ title, time, attendees, handleClick, blurred}) {
     let guest_string = attendees ? attendees.map(attendee => attendee.email).join(", ") : "";
 
     return (
-        <div className="eventBlock" onClick={handleClick}>
-            <div className="eventTitle">{title}</div>
-            <p>{time}</p>
-            <div className="eventGuests">{guest_string}</div>
+        <div>
+            {!blurred && ( <div className="eventBlock" onClick={handleClick}>
+                <div className="eventTitle">{title}</div>
+                <p>{time}</p>
+                <div className="eventGuests">{guest_string}</div>
+            </div> )}
+            {blurred && ( <div className="eventBlockBlurred" onClick={handleClick}>
+                <div className="eventTitle">{title}</div>
+                <p>{time}</p>
+                <div className="eventGuests">{guest_string}</div>
+            </div> )}
         </div>
     );
 }
@@ -86,62 +93,28 @@ export default function Dashboard() {
             attendees={event.attendees}
             description={event.description}
             handleClick={() => onEventClick(event.title, event.time, event.attendees, event.description)}
+            blurred={show}
         />
     ));
 
     return (
         <div className="dashboard">
-                                <nav className="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-            <div className="container-fluid">
-                <a className="navbar-brand" href="#">Navbar</a>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarColor01">
-                    <ul className="navbar-nav me-auto">
-                        <li className="nav-item">
-                            <a className="nav-link active" href="#">Home
-                                <span className="visually-hidden">(current)</span>
-                            </a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="#">Features</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="#">Pricing</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="#">About</a>
-                        </li>
-                        <li className="nav-item dropdown">
-                            <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-                            <div className="dropdown-menu">
-                                <a className="dropdown-item" href="#">Action</a>
-                                <a className="dropdown-item" href="#">Another action</a>
-                                <a className="dropdown-item" href="#">Something else here</a>
-                                <div className="dropdown-divider"></div>
-                                <a className="dropdown-item" href="#">Separated link</a>
-                            </div>
-                        </li>
-                    </ul>
-                    <form className="d-flex">
-                        <input className="form-control me-sm-2" type="search" placeholder="Search" />
-                        <button className="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-                    </form>
-                </div>
-  </div>
-</nav>
-            <div className="search-bar">
-                <input
+            <div className="d-flex">
+                {show && (<div class="form-control me-sm-2">
+                {' '}</div>)}
+                {!show &&  (<input
+                    class="form-control me-sm-2"
                     type="text"
                     placeholder="Search events..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
+                    onChange={(e) => setSearchQuery(e.target.value)}>
+                </input>)}
+
             </div>
             {show && (
                 <div className="expandedEvent">
-                    <div className="xButton" onClick={() => onXClick()}></div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => onXClick()}></button>
+                    {/* <div className="xButton" onClick={() => onXClick()}></div> */}
                     <h2>{popup.title}</h2>
                     <p>{popup.time}</p>
                     <p>{popup.guests}</p>

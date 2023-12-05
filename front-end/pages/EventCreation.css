@@ -1,29 +1,19 @@
 .event-form {
-    max-width: 100%;
-    margin: 0 auto;
-  }
+  width: 600px;
+  margin: 0 auto;
+}
   
-  .event-form div {
-    margin-bottom: 16px;
-  }
   
-  .event-form label {
-    display: block;
-    margin-bottom: 8px;
-  }
+.event-form input, 
+.event-form textarea,
+.event-form select {
+  border-radius: 10px;
+}
   
-  .event-form input,
-  .event-form textarea,
-  .event-form select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 8px;
-    box-sizing: border-box;
-  }
-  
-  .event-form button {
-    background-color: #4caf50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-  }
+.event-form button {
+  background-color: #4bbf73;
+  color: white;
+  padding: 10px 15px;
+  margin-top: 15px;
+  border: none;
+}
