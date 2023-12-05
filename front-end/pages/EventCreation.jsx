@@ -73,8 +73,6 @@ const EventForm = () => {
     }
   };
 
-  // const groups = ['Group A', 'Group B', 'Group C']; // Add your group names here
-
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -209,20 +207,6 @@ const EventForm = () => {
               className="form-control"
               maxLength="250"
             />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="group" className="form-label">Select Group:</label>
-            <select
-              id="group"
-              value={selectedGroup}
-              onChange={(e) => setSelectedGroup(e.target.value)}
-              className="form-select"
-            >
-              <option value="" disabled>Select a group</option>
-              {groups.map((group, index) => (
-                <option key={index} value={group}>{group}</option>
-              ))}
-            </select>
           </div>
           <button type="submit" className="btn btn-primary">Create Event</button>
         </div>
