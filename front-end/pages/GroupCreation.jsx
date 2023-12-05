@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import useToken from "../src/useToken";
+import './GroupCreation.css';
 
 const GroupForm = () => {
   const [groupName, setGroupName] = useState('');  
@@ -34,6 +35,11 @@ const GroupForm = () => {
     }
   };
 
+  useEffect(() => {
+    fetchUsers('');
+  }, [tokenInfo.userId]);
+
+
   const handleInputChange = (newValue) => {
     setSearchTerm(newValue);
     fetchUsers(newValue);
@@ -65,8 +71,7 @@ const GroupForm = () => {
         console.log(action);
     }
   
-    setSearchTerm('');
-    setOptions([]);
+    handleInputChange('');
   };
 
   const handleCreateGroup = async () => {
@@ -105,26 +110,35 @@ const GroupForm = () => {
     }
     setGroupName('');
     setSelectedUsers([]);
-    setSearchTerm('');
-    setOptions([]);
+    handleInputChange('');
   };
 
   return (
-    <div>
-      {groupCreated && <p>Group created successfully!</p>}
+    <form onSubmit={handleCreateGroup} className="group-form">
+      
+      <p></p>
       <h2>Create Group</h2>
-      <input type='text' value={groupName} onChange={e => setGroupName(e.target.value)} />
-      <Select
-        isMulti
-        value={selectedUsers}
-        options={options}
-        onInputChange={handleInputChange}
-        onChange={handleUserSelect}
-        onMenuClose={() => setSearchTerm('')}
-        placeholder="Search for users..."
-      />
-      <button onClick={handleCreateGroup}>Create Group</button>
-    </div> 
+      <div className="container mt-3">
+        <div className="mb-3">
+          <label htmlFor="group-name" className="form-label">Group Name:</label>
+          <input type='text' id="group-name" value={groupName} onChange={(e) => setGroupName(e.target.value)} required className="form-control" />
+        </div>
+        <div className="mb-3">
+          <Select
+            isMulti
+            value={selectedUsers}
+            options={options}
+            onInputChange={handleInputChange}
+            onChange={handleUserSelect}
+            onMenuClose={() => setSearchTerm('')}
+            placeholder="Search for users..."
+          />
+        </div>
+        {!groupCreated && <p></p>}
+        {groupCreated && <p>Group created successfully!</p>}
+        <button type="submit" className="btn btn-primary">Create Group</button>
+      </div>
+    </form> 
   );
 };
 

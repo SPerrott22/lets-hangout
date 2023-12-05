@@ -121,6 +121,8 @@ const EventForm = () => {
 
     return (
       <form onSubmit={handleSubmit} className="event-form">
+        <p></p>
+        <h2>Create Event</h2>
         <div className="container mt-3">
           <div className="mb-3">
             <label htmlFor="group" className="form-label">Select Group:</label>
@@ -128,7 +130,6 @@ const EventForm = () => {
               value={selectedGroup}
               options={groupOptions}
               onChange={handleGroupSelect}
-              className="form-control"
             />
           </div>
 
