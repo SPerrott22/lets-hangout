@@ -110,11 +110,11 @@ export default function Login() {
                 <div className="row g-3 mb-3">
                     <div className="col">
                         <label htmlFor="username" className="form-label">Username</label>
-                        <input id="username" type="text" onChange={e => setUserName(e.target.value)} className="form-control"/>
+                        <input id="username" type="text" onChange={e => setUserName(e.target.value)} required className="form-control"/>
                     </div>
                     <div className="col">
                         <label htmlFor="password" className="form-label">Password</label>
-                        <input id="password" type="password" onChange={e => setPassword(e.target.value)} className="form-control"/>
+                        <input id="password" type="password" onChange={e => setPassword(e.target.value)} required className="form-control"/>
                     </div>
                 </div>
                 <p></p>

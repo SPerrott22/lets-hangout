@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { redirect, Navigate } from 'react-router-dom';
-import "./EventCreation.css";
+import "./AccountCreation.css";
 
 
 const AccountCreation = () => {
