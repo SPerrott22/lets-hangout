@@ -22,6 +22,9 @@ const EventForm = () => {
       try {
         const response = await fetch(`http://localhost:4000/user/${tokenInfo.userId}/groups`,{
           method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${tokenInfo.token}`
+          }
         });
         const data = await response.json();
         console.log("Response fron server:", data);
@@ -68,6 +71,7 @@ const EventForm = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenInfo.token}`
         },
         body: JSON.stringify({
           group_id: selectedGroup.value,
