@@ -23,8 +23,10 @@ const GroupForm = () => {
       }
   
       const data = await response.json();
+      const filteredUsers = data.users.filter(user => user.id !== tokenInfo.userId);
+
   
-      const userOptions = data.users.map((user) => ({
+      const userOptions = filteredUsers.map((user) => ({
         value: user.id,
         label: `${user.first_name} ${user.last_name} (${user.email})`,
       }));
