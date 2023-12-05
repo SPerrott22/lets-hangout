@@ -15,6 +15,7 @@ import './App.css';
 import EventForm from '../pages/EventCreation';
 import { TokenContext } from '../context/TokenContext.jsx';
 import AccountCreation from '../pages/AccountCreation';
+import GroupForm from '../pages/GroupCreation';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from "react-router-dom"
 
@@ -143,6 +144,11 @@ function App() {
               <Route path="/event_creation" element= {
                 <RequireAuth>
                   <EventForm />
+                </RequireAuth>
+              } /> 
+              <Route path="/group_creation" element= {
+                <RequireAuth>
+                  <GroupForm />
                 </RequireAuth>
               } /> 
               <Route path = "/account" element = {<AccountCreation/>}/>

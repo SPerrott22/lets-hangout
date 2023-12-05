@@ -1,41 +1,116 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import Select from 'react-select';
 import moment from 'moment';
 import './EventCreation.css'; // Import the CSS file for styling
-
-const PeopleList = ({ people }) => (
-  <div className="container">
-    <h3>People in the Group:</h3>
-    <ul className="list-group">
-      {people.map((person, index) => (
-        <li key={index} className="list-group-item">{person}</li>
-      ))}
-    </ul>
-  </div>
-);
+import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
+import { useNavigate } from 'react-router-dom';
 
 const EventForm = () => {
   const [title, setTitle] = useState('');
-  const [start_date, setStartDate] = useState('');
-  const [start_time, setStartTime] = useState('');
-  const [end_date, setEndDate] = useState('');
-  const [end_time, setEndTime] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [description, setDescription] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState('');
-  const [people, setPeople] = useState([]);
-  const [newPerson, setNewPerson] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState();
+  const [groupOptions, setGroupOptions] = useState([]);
 
-  const groups = ['Group A', 'Group B', 'Group C']; // Add your group names here
+  const { tokenInfo, deleteToken } = useContext(TokenContext);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    // Fetch user's groups when the component mounts
+    const fetchGroups = async () => {
+      try {
+        const response = await fetch(`http://localhost:4000/user/${tokenInfo.userId}/groups`,{
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${tokenInfo.token}`
+          }
+        }).then(response => {
+          if (response.status === 401) { // Check for a 401 response
+            handleTokenExpiration(); // Handle token expiration
+            return; // Exit the function early
+          }
+          return response;
+        });
+        const data = await response.json();
+        console.log("Response fron server:", data);
+
+        const groupOptions = data.map((g) => ({
+          value: g.group_id,
+          label: g.group_name
+        }))
+
+        setGroupOptions(groupOptions);
+      } catch (error) {
+        console.error('Error fetching user groups:', error);
+      }
+    };
+
+    fetchGroups();
+  }, [tokenInfo.userId]); // Run this effect when the user ID changes
+
+  const handleTokenExpiration = () => {
+    // Optionally clear token or any auth-related data here
+    // localStorage.removeItem('token');
+    // localStorage.removeItem('user_id');
+    // Redirect to login
+    deleteToken(); 
+    navigate('/login');
+  }
+
+  const handleGroupSelect = (selectedOption, action) => {
+    if (action.action === 'clear') {
+    } else if (action.action === 'select-option') {
+      setSelectedGroup(selectedOption);
+    } else if (action.action === 'remove-value') {
+    } else if (action.action === 'pop-value') {
+    } else {
+        console.log("Not clear or select option");
+        console.log(selectedOption);
+        console.log(action);
+    }
+  };
+
+  // const groups = ['Group A', 'Group B', 'Group C']; // Add your group names here
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const startDateTime = moment(`${start_date} ${start_time}`, 'MM/DD/YY HH:mm');
-    const endDateTime = moment(`${end_date} ${end_time}`, 'MM/DD/YY HH:mm');
+  
+    const startDateTime = moment(`${startDate} ${startTime}`, 'MM/DD/YY HH:mm');
+    const endDateTime = moment(`${endDate} ${endTime}`, 'MM/DD/YY HH:mm');
+    const attendees = [];
 
-    console.log('Form submitted:', { title, startDateTime, endDateTime, description, selectedGroup });
+    try {
+      const response = await fetch('http://localhost:4000/event', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenInfo.token}`
+        },
+        body: JSON.stringify({
+          group_id: selectedGroup.value,
+          title,
+          description,
+          time: startDateTime.format('YYYY-MM-DD HH:mm:ss'),
 
-    // You can perform further actions with the collected data here
-    // For now, it's just logging the data to the console
-
+          //time: endDateTime.format('YYYY-MM-DD HH:mm:ss'),
+          attendees
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Event created successfully. Event ID:', data.id);
+      } else {
+        const errorData = await response.json();
+        console.error('Error creating event:', errorData.message);
+      }
+    } catch (error) {
+      console.error('Error creating event:', error.message);
+    }
+  
     // Clear form fields after submission
     setTitle('');
     setStartDate('');
@@ -43,21 +118,21 @@ const EventForm = () => {
     setEndDate('');
     setEndTime('');
     setDescription('');
-    setSelectedGroup('');
-    setPeople([]);
-    setNewPerson('');
-  };
-
-  const handleAddPerson = () => {
-    if (newPerson.trim() !== '') {
-      setPeople([...people, newPerson]);
-      setNewPerson('');
-    }
+    setSelectedGroup(null);  // Reset selected group to null
   };
 
     return (
       <form onSubmit={handleSubmit} className="event-form">
         <div className="container mt-3">
+        <div className="mb-3">
+            <label htmlFor="group" className="form-label">Select Group:</label>
+            <Select
+              value={selectedGroup}
+              options={groupOptions}
+              onChange={handleGroupSelect}
+            />
+          </div>
+
           <div className="mb-3">
             <label htmlFor="title" className="form-label">Event Title:</label>
             <input
@@ -76,7 +151,7 @@ const EventForm = () => {
               <input
                 type="text"
                 id="start_date"
-                value={start_date}
+                value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 placeholder="MM/DD/YY"
                 required
@@ -88,7 +163,7 @@ const EventForm = () => {
               <input
                 type="text"
                 id="start_time"
-                value={start_time}
+                value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 placeholder="HH:mm"
                 required
@@ -103,7 +178,7 @@ const EventForm = () => {
               <input
                 type="text"
                 id="end_date"
-                value={end_date}
+                value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 placeholder="MM/DD/YY"
                 required
@@ -115,7 +190,7 @@ const EventForm = () => {
               <input
                 type="text"
                 id="end_time"
-                value={end_time}
+                value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
                 placeholder="HH:mm"
                 required
@@ -132,9 +207,9 @@ const EventForm = () => {
               onChange={(e) => setDescription(e.target.value)}
               required
               className="form-control"
+              maxLength="250"
             />
           </div>
-  
           <div className="mb-3">
             <label htmlFor="group" className="form-label">Select Group:</label>
             <select
@@ -149,7 +224,6 @@ const EventForm = () => {
               ))}
             </select>
           </div>
-  
           <button type="submit" className="btn btn-primary">Create Event</button>
         </div>
       </form>
