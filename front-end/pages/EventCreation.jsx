@@ -3,6 +3,7 @@ import Select from 'react-select';
 import moment from 'moment';
 import './EventCreation.css'; // Import the CSS file for styling
 import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
+import { useNavigate } from 'react-router-dom';
 
 const EventForm = () => {
   const [title, setTitle] = useState('');
@@ -15,6 +16,7 @@ const EventForm = () => {
   const [groupOptions, setGroupOptions] = useState([]);
 
   const { tokenInfo, deleteToken } = useContext(TokenContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch user's groups when the component mounts
@@ -25,6 +27,12 @@ const EventForm = () => {
           headers: {
             'Authorization': `Bearer ${tokenInfo.token}`
           }
+        }).then(response => {
+          if (response.status === 401) { // Check for a 401 response
+            handleTokenExpiration(); // Handle token expiration
+            return; // Exit the function early
+          }
+          return response;
         });
         const data = await response.json();
         console.log("Response fron server:", data);
@@ -42,6 +50,15 @@ const EventForm = () => {
 
     fetchGroups();
   }, [tokenInfo.userId]); // Run this effect when the user ID changes
+
+  const handleTokenExpiration = () => {
+    // Optionally clear token or any auth-related data here
+    // localStorage.removeItem('token');
+    // localStorage.removeItem('user_id');
+    // Redirect to login
+    deleteToken(); 
+    navigate('/login');
+  }
 
   const handleGroupSelect = (selectedOption, action) => {
     if (action.action === 'clear') {
@@ -63,9 +80,8 @@ const EventForm = () => {
   
     const startDateTime = moment(`${startDate} ${startTime}`, 'MM/DD/YY HH:mm');
     const endDateTime = moment(`${endDate} ${endTime}`, 'MM/DD/YY HH:mm');
-  
-    const attendees = selectedGroup ? selectedGroup.value : null;
-  
+    const attendees = [];
+
     try {
       const response = await fetch('http://localhost:4000/event', {
         method: 'POST',
@@ -80,7 +96,7 @@ const EventForm = () => {
           time: startDateTime.format('YYYY-MM-DD HH:mm:ss'),
 
           //time: endDateTime.format('YYYY-MM-DD HH:mm:ss'),
-          attendees: attendees ? [attendees] : [],  // Pass as an array if it exists
+          attendees
         }),
       });
   
@@ -191,6 +207,7 @@ const EventForm = () => {
               onChange={(e) => setDescription(e.target.value)}
               required
               className="form-control"
+              maxLength="250"
             />
           </div>
   
