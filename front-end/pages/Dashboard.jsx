@@ -4,6 +4,9 @@ import { TokenContext } from '../context/TokenContext.jsx'; // Import the contex
 import './Dashboard.css';
 
 function EventBlock({ title, startTime, endTime, attendees, handleClick, blurred}) {
+    const { tokenInfo, deleteToken } = useContext(TokenContext);
+    const rsvp_status = attendees.some((a) => a.id === tokenInfo.userId);
+    const [hasRSVPed, setRSVPed] = useState(rsvp_status);
     let guest_string = attendees ? attendees.map(attendee => attendee.email).join(", ") : "";
 
     return (
@@ -18,6 +21,19 @@ function EventBlock({ title, startTime, endTime, attendees, handleClick, blurred
                 <p>{startTime} to<br/>{endTime}</p>
                 <div className="eventGuests">{guest_string}</div>
             </div> )}
+        </div>
+    );
+}
+
+function ExpandedEvent({ title, startTime, endTime, attendees, description, RSVPEvent, handleXClick}) {
+    return ( 
+        <div className="expandedEvent">
+            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleXClick}></button>
+            <h2>{title}</h2>
+            <p>{startTime} to<br/>{endTime}</p>
+            <p>{attendees.map(attendee => attendee.email).join(", ")}</p>
+            <div className="expandedEventDescription">{description}</div>
+            <div className="rsvp-button"><button type="button" className="btn btn-primary" onClick={RSVPEvent}>RSVP</button></div>
         </div>
     );
 }
@@ -141,14 +157,15 @@ export default function Dashboard() {
 
             </div>
             {show && (
-                <div className="expandedEvent">
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => onXClick()}></button>
-                    <h2>{popup.title}</h2>
-                    <p>{popup.startTime} to<br/>{popup.endTime}</p>
-                    <p>{popup.guests.map(attendee => attendee.email).join(", ")}</p>
-                    <div className="expandedEventDescription">{popup.description}</div>
-                    <div className="rsvp-button"><button type="button" className="btn btn-primary" onClick={RSVP}>RSVP</button></div>
-                </div>
+                <ExpandedEvent
+                    title={popup.title}
+                    startTime={popup.startTime}
+                    endTime={popup.endTime}
+                    attendees={popup.guests}
+                    description={popup.description}
+                    RSVPEvent={RSVP}
+                    handleXClick={onXClick}
+                />
             )}
             <div className="eventArea">
                 {eventItems}
