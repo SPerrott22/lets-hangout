@@ -25,7 +25,31 @@ function EventBlock({ title, startTime, endTime, attendees, handleClick, blurred
     );
 }
 
-function ExpandedEvent({ title, startTime, endTime, attendees, description, RSVPEvent, handleXClick}) {
+function ExpandedEvent({ id, title, startTime, endTime, attendees, description, RSVPEvent, handleXClick, setPopup}) {
+    const { tokenInfo, deleteToken } = useContext(TokenContext);
+    const rsvp_status = attendees.some((a) => a.id === tokenInfo.userId);
+    const [hasRSVPed, setRSVPed] = useState(rsvp_status);
+
+    function handleClick() {
+        RSVPEvent();
+        const currentAttendee = {
+            id: tokenInfo.userId,
+            email: tokenInfo.userEmail
+        }
+        const new_attendees = rsvp_status ? attendees.filter((a) => a.id !== tokenInfo.userId) : [...attendees, currentAttendee]
+
+        setRSVPed(!hasRSVPed);
+        setPopup({
+            id: id,
+            title: title,
+            startTime: startTime,
+            endTime: endTime,
+            guests: new_attendees,
+            description: description
+        });
+
+    }
+
     return ( 
         <div className="expandedEvent">
             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleXClick}></button>
@@ -33,7 +57,8 @@ function ExpandedEvent({ title, startTime, endTime, attendees, description, RSVP
             <p>{startTime} to<br/>{endTime}</p>
             <p>{attendees.map(attendee => attendee.email).join(", ")}</p>
             <div className="expandedEventDescription">{description}</div>
-            <div className="rsvp-button"><button type="button" className="btn btn-primary" onClick={RSVPEvent}>RSVP</button></div>
+            {!hasRSVPed && (<div className="rsvp-button"><button type="button" className="btn btn-primary" onClick={handleClick}>RSVP</button></div>)}
+            {hasRSVPed && (<div className="rsvp-button"><button type="button" className="btn btn-danger" onClick={handleClick}>Un-RSVP</button></div>)}
         </div>
     );
 }
@@ -48,7 +73,7 @@ export default function Dashboard() {
 
 
     useEffect(() => {
-        if (tokenInfo.token && tokenInfo.userId) {
+        if (tokenInfo.token && tokenInfo.userId && tokenInfo.userEmail) {
             fetch(`http://localhost:4000/user/${tokenInfo.userId}/groups_events?full=True`, {
                 method: 'GET',
                 headers: {
@@ -105,7 +130,8 @@ export default function Dashboard() {
 
     async function RSVP() {
         const rsvp_status = popup.guests.some((a) => a.id === tokenInfo.userId);
-        const newAttendeesList = rsvp_status ? popup.guests.filter((a) => a.id !== tokenInfo.userId) : [...popup.guests, tokenInfo.userId];
+        const newAttendeesList = rsvp_status ? popup.guests.filter((a) => a.id !== tokenInfo.userId).map((a) => a.id) : [...popup.guests.map((a) => a.id), tokenInfo.userId];
+        console.log(newAttendeesList);
         console.log(JSON.stringify({
             attendees: newAttendeesList
         }));
@@ -158,6 +184,7 @@ export default function Dashboard() {
             </div>
             {show && (
                 <ExpandedEvent
+                    id={popup.id}
                     title={popup.title}
                     startTime={popup.startTime}
                     endTime={popup.endTime}
@@ -165,6 +192,8 @@ export default function Dashboard() {
                     description={popup.description}
                     RSVPEvent={RSVP}
                     handleXClick={onXClick}
+                    setPopup={setPopup}
+                    popup={popup}
                 />
             )}
             <div className="eventArea">

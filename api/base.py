@@ -732,7 +732,7 @@ def login():
     if current_user is None:
         return jsonify({"error":"Invalid credentials"}), 401
     access_token = create_access_token(identity=current_user.email)
-    return jsonify(token=access_token, user_id=str(current_user.id)), 200
+    return jsonify(token=access_token, user_id=str(current_user.id), user_email=current_user.email), 200
   except argon2.exceptions.VerifyMismatchError:
     return jsonify({"error": "Invalid username or password"}), 401
   except Exception as e:

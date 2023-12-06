@@ -75,10 +75,10 @@ export default function Login() {
         try {
             const response = await loginUser(username, password);
             // console.log(response);
-            if (response && response.token && response.user_id) {
+            if (response && response.token && response.user_id && response.user_email) {
                 // console.log(response.token);
                 // console.log(response.user_id);
-                setToken(response.token, response.user_id);
+                setToken(response.token, response.user_id, response.user_email);
                 navigate(from, { replace: true });
             } else {
                 // Handle the case where token is not present or response is undefined
