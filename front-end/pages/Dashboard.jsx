@@ -6,29 +6,28 @@ import './Dashboard.css';
 function EventBlock({ title, startTime, endTime, attendees, handleClick, blurred, rsvp_status}) {
     const { tokenInfo, deleteToken } = useContext(TokenContext);
 
-    const currentAttendee = {
-        id: tokenInfo.userId,
-        email: tokenInfo.userEmail
-    }
-    let newGuests = attendees;
-    let found = false;
-    for(const a of newGuests) {
-        if(a.id === currentAttendee.id) {
-            found = true;
-            break;
-        }
-    }
-    if(rsvp_status && !found) {
-        newGuests = [...newGuests, currentAttendee];
-    } else if(!rsvp_status && found) {
-        attendees.filter((a) => a.id !== tokenInfo.userId);
-    }
-    attendees = newGuests;
+    // const currentAttendee = {
+    //     id: tokenInfo.userId,
+    //     email: tokenInfo.userEmail
+    // }
+    // let newGuests = attendees;
+    // let found = false;
+    // for(const a of newGuests) {
+    //     if(a.id === currentAttendee.id) {
+    //         found = true;
+    //         break;
+    //     }
+    // }
+    // if(rsvp_status && !found) {
+    //     newGuests = [...newGuests, currentAttendee];
+    // } else if(!rsvp_status && found) {
+    //     attendees.filter((a) => a.id !== tokenInfo.userId);
+    // }
+    // attendees = newGuests;
     let guest_string = attendees ? attendees.map(attendees => attendees.email).join(", ") : "";
 
     
 
-    console.log("event block " + rsvp_status);
     let classString = "eventBlock";
     if(blurred) {
         classString = classString + " blurred"
@@ -140,9 +139,7 @@ export default function Dashboard() {
                             initialRSVPs[e.event_id] = e.attendees.some((a) => a.id === tokenInfo.userId);
                         }
                     }
-                    console.log(initialRSVPs)
                     setRSVPs(initialRSVPs);
-                    console.log(rsvpStatuses);
                 }
             })
             .catch(error => console.error('Error fetching events:', error));
@@ -174,7 +171,7 @@ export default function Dashboard() {
     }
 
     // Filter events based on the search query
-    const filteredEvents = groupsEvents.flatMap(group =>
+    let filteredEvents = groupsEvents.flatMap(group =>
         group.events.filter(event =>
             event.title.toLowerCase().includes(searchQuery.toLowerCase())
         )
@@ -183,7 +180,6 @@ export default function Dashboard() {
     async function RSVP() {
         const rsvp_status = popup.guests.some((a) => a.id === tokenInfo.userId);
         const newAttendeesList = rsvp_status ? popup.guests.filter((a) => a.id !== tokenInfo.userId).map((a) => a.id) : [...popup.guests.map((a) => a.id), tokenInfo.userId];
-        console.log(newAttendeesList);
         console.log(JSON.stringify({
             attendees: newAttendeesList
         }));
@@ -206,16 +202,26 @@ export default function Dashboard() {
             console.error('Error RSVPing:', errorData.message);
         }
 
-
-       // let newRSVPs = rsvpStatuses;
-        //newRSVPs[popup.id] = !newRSVPS[popup.id];
         setRSVPs({
             ...rsvpStatuses,
             [popup.id]: !rsvpStatuses[popup.id]
         });
 
-        
+        for(const e of filteredEvents) {
+            if(e.event_id === popup.id) {
+                const currentAttendee = {
+                    id: tokenInfo.userId,
+                    email: tokenInfo.userEmail
+                }
+                const new_attendees = rsvp_status ? e.attendees.filter((a) => a.id !== tokenInfo.userId) : [...e.attendees, currentAttendee]
+                console.log(new_attendees);
+                e.attendees = new_attendees;
+                break;
+            }
+        }
     }
+
+    
 
     const eventItems = filteredEvents.map(event => (
         <EventBlock
