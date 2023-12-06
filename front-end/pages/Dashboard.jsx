@@ -3,19 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
 import './Dashboard.css';
 
-function EventBlock({ title, time, attendees, handleClick, blurred}) {
+function EventBlock({ title, startTime, endTime, attendees, handleClick, blurred}) {
     let guest_string = attendees ? attendees.map(attendee => attendee.email).join(", ") : "";
 
     return (
         <div>
             {!blurred && ( <div className="eventBlock" onClick={handleClick}>
                 <div className="eventTitle">{title}</div>
-                <p>{time}</p>
+                <p>{startTime} to<br/>{endTime}</p>
                 <div className="eventGuests">{guest_string}</div>
             </div> )}
             {blurred && ( <div className="eventBlockBlurred" onClick={handleClick}>
                 <div className="eventTitle">{title}</div>
-                <p>{time}</p>
+                <p>{startTime} to<br/>{endTime}</p>
                 <div className="eventGuests">{guest_string}</div>
             </div> )}
         </div>
@@ -25,7 +25,7 @@ function EventBlock({ title, time, attendees, handleClick, blurred}) {
 export default function Dashboard() {
     const [groupsEvents, setGroupsEvents] = useState([]);
     const [show, setShow] = useState(false);
-    const [popup, setPopup] = useState({ title: "", time: "", guests: "", description: "" });
+    const [popup, setPopup] = useState({ title: "", startTime: "", endTime: "", guests: "", description: "" });
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
     const { tokenInfo, deleteToken } = useContext(TokenContext); // Use context
@@ -64,10 +64,12 @@ export default function Dashboard() {
         deleteToken(); 
         navigate('/login');
     }
-    function onEventClick(title, time, attendees, description) {
+    function onEventClick(title, startTime, endTime, attendees, description) {
+        console.log(attendees);
         setPopup({
             title: title,
-            time: time,
+            startTime: startTime,
+            endTime: endTime,
             guests: attendees.map(attendee => attendee.email).join(", "),
             description: description
         });
@@ -89,10 +91,11 @@ export default function Dashboard() {
         <EventBlock
             key={event.event_id}
             title={event.title}
-            time={event.time}
+            startTime={event.start_time}
+            endTime={event.end_time}
             attendees={event.attendees}
             description={event.description}
-            handleClick={() => onEventClick(event.title, event.time, event.attendees, event.description)}
+            handleClick={() => onEventClick(event.title, event.start_time, event.end_time, event.attendees, event.description)}
             blurred={show}
         />
     ));
@@ -100,7 +103,7 @@ export default function Dashboard() {
     return (
         <div className="dashboard">
             <div className="d-flex">
-                {show && (<div class="form-control me-sm-2">
+                {show && (<div className="form-control me-sm-2">
                 </div>)}
                 {!show &&  (<input
                     className="form-control me-sm-2"
@@ -113,9 +116,9 @@ export default function Dashboard() {
             </div>
             {show && (
                 <div className="expandedEvent">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => onXClick()}></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => onXClick()}></button>
                     <h2>{popup.title}</h2>
-                    <p>{popup.time}</p>
+                    <p>{popup.startTime} to<br/>{popup.endTime}</p>
                     <p>{popup.guests}</p>
                     <div className="expandedEventDescription">{popup.description}</div>
                 </div>
