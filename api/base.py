@@ -180,9 +180,18 @@ def get_user_groups(user_id_str):
         return jsonify({'message': 'User not found'}), 404
 
     user_groups = Group.query.filter(Group.users.any(id=user_id)).all()
-    result = [{'group_id': str(group.id), 'group_name': group.name} for group in user_groups]
+    result = []
+
+    for group in user_groups:
+        group_info = {
+            'group_id': str(group.id),
+            'group_name': group.name,
+            'users': [{'id': str(u.id), 'email': u.email, 'first_name': u.first_name, 'last_name': u.last_name} for u in group.users]
+        }
+        result.append(group_info)
 
     return jsonify(result), 200
+
 
 @app.route('/group/<string:group_id_str>/leave', methods=['POST'])
 @jwt_required()
