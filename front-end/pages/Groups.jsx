@@ -29,7 +29,7 @@ function ExpandedGroup({ title, members, handleXClick}) {
             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleXClick}></button>
             <h2>{title}</h2>
             <p></p>
-            <p>Members:<br/>{members.map(member => member.email).join(", ")}</p>
+            <div className="bottom-margin"><div className="expandedGroupList">Members:<br/>{members.map(member => member.email).join(", ")}</div></div>
         </div>
     );
 }
