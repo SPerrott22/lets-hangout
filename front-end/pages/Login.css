@@ -12,3 +12,84 @@
     background-color: #4bbf73;
     margin-top: 15px;
 }
+
+
+.login-wrapper {
+    flex: 1; /* This will allow the card to take up only as much space as it needs */
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+    /* min-height: calc(100vh - 120px); Assuming the header and footer are 60px each */
+    padding: 20px;
+    width: 100%; /* Use the full width of the main-container. */
+    max-width: 500px; /* Maximum width of the wrapper. Adjust as needed. */
+    margin: auto; /* This will take precedence over flexbox alignment when the content is taller than the viewport. */
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 50vh; /* Full viewport height */
+}
+
+.login-container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-title {
+    text-align: center;
+    margin-bottom: 20px; /* Adds space below the title. */
+}
+
+.btn-login {
+    width: 100%; /* Full width button */
+    padding: 10px;
+    margin-top: 20px; /* Add some margin to the top of the button */
+}
+
+/* Error message style */
+.alert-danger {
+    margin-bottom: 20px;
+}
+
+
+
+/* Flexbox setup to center the login-wrapper both vertically and horizontally. */
+.main-container {
+    display: flex;
+    align-items: center; /* Centers vertically. */
+    justify-content: center; /* Centers horizontally. */
+    min-height: 70vh; /* Use the viewport height to ensure full height coverage. */
+    padding: 10px; /* Add some padding around the edges. */
+}
+
+
+.login-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px; /* Adds some space between the login form and the create account card. */
+}
+
+/* Styles for the Create Account card */
+.card.shadow-sm {
+    background: #fff;
+    padding: 5px; /* Reduced padding for a smaller card. */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Center the text inside the card. */
+}
+
+.btn-create-account {
+    width: 100%; /* Makes the button extend the full width of the card. */
+    margin-top: 10px; /* Adds space above the button. */
+}
+
+/* You can adjust the values as necessary to achieve the desired look. */
