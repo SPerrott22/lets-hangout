@@ -71,7 +71,7 @@ body {
     background-color: rgb(217,234,244);
     border-radius: 25px;
     width: 600px;
-    height: 300px;
+    height: fit-content;
 
     place-items: center;
 
@@ -98,6 +98,6 @@ body {
     top: 10px;
 }
 
-.btn-primary {
-    background-color: #4bbf73;
+.bottom-margin {
+    margin-bottom: 20px;
 }

@@ -77,7 +77,7 @@ body {
     border: solid 4px #989898;
     border-radius: 25px;
     width: 600px;
-    height: 300px;
+    height: fit-content;
 
     place-items: center;
 
@@ -111,4 +111,5 @@ body {
 .rsvp-button {
     position: relative;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
