@@ -513,7 +513,7 @@ def update_event(event_id_str):
                 event.end_time = pytz.utc.localize(datetime.strptime(end_time_str, '%Y-%m-%d %H:%M'))
 
             if 'attendees' in data:
-                attendee_ids = set(data['attendees'])
+                attendee_ids = [int(x) for x in set(data['attendees'])]
                 valid_users = User.query.filter(User.id.in_(attendee_ids)).all()
                 if len(valid_users) != len(attendee_ids):
                     return jsonify({'message': 'Invalid attendee IDs'}), 400
@@ -524,7 +524,7 @@ def update_event(event_id_str):
 
                 event.attendees = valid_group_members
 
-        elif 'attendees' in data and len(data) == 1 and current_user.id in data['attendees']:
+        elif 'attendees' in data and len(data) == 1:
             # User RSVP'ing to event
             if current_user in event.attendees:
                 event.attendees.remove(current_user)
@@ -732,7 +732,7 @@ def login():
     if current_user is None:
         return jsonify({"error":"Invalid credentials"}), 401
     access_token = create_access_token(identity=current_user.email)
-    return jsonify(token=access_token, user_id=str(current_user.id)), 200
+    return jsonify(token=access_token, user_id=str(current_user.id), user_email=current_user.email), 200
   except argon2.exceptions.VerifyMismatchError:
     return jsonify({"error": "Invalid username or password"}), 401
   except Exception as e:

@@ -26,7 +26,6 @@ body {
 .eventBlock {
     border: solid 4px #989898;
     border-radius: 25px;
-    background-color: rgb(217,234,244);
     margin: 20px;
     padding-top: 20px;
     padding-bottom: 20px;
@@ -37,21 +36,19 @@ body {
     place-items: center;
 }
 
-.eventBlockBlurred {
-    border: solid 4px #989898;
-    border-radius: 25px;
+.notRsvped {
     background-color: rgb(217,234,244);
-    margin: 20px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    width: 320px;
-    height: 140px;
+}
 
-    display: grid; 
-    place-items: center;
+.rsvped {
+    background-color: #e1f1e4;
+}
 
+.blurred {
     filter: blur(3px);
 }
+
+
 
 .eventBlock:hover {
     border: solid 4px rgb(2, 23, 253);
@@ -79,9 +76,7 @@ body {
 .expandedEvent {
     border: solid 4px #989898;
     border-radius: 25px;
-    background-color: rgba(217,234,244);
     width: 600px;
-
     height: 300px;
 
     place-items: center;
@@ -102,8 +97,18 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
-.expandedEvent button {
+
+.btn-close {
     position: relative;
     left: 270px;
     top: 10px;
+}
+
+.btn-primary {
+    background-color: #4bbf73;
+}
+
+.rsvp-button {
+    position: relative;
+    margin-top: 20px;
 }

@@ -4,21 +4,24 @@ export default function useToken() {
     const getToken = () => {
         const tokenString = localStorage.getItem('token');
         const userId = localStorage.getItem('user_id');
-        return { token: tokenString, userId };
+        const userEmail = localStorage.getItem('email');
+        return { token: tokenString, userId, userEmail };
     }
 
     const [tokenInfo, setTokenInfo] = useState(getToken());
 
-    const saveToken = (userToken, userId) => {
+    const saveToken = (userToken, userId, userEmail) => {
         localStorage.setItem('token', userToken);
         localStorage.setItem('user_id', userId);
-        setTokenInfo({ token: userToken, userId: userId });
+        localStorage.setItem('email', userEmail)
+        setTokenInfo({ token: userToken, userId: userId, userEmail: userEmail });
     };
 
     const deleteToken = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user_id');
-        setTokenInfo({ token: null, userId: null });
+        localStorage.removeItem('email');
+        setTokenInfo({ token: null, userId: null, userEmail: null });
     };
 
 
