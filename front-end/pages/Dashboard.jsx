@@ -4,8 +4,6 @@ import { TokenContext } from '../context/TokenContext.jsx'; // Import the contex
 import './Dashboard.css';
 
 function EventBlock({ title, startTime, endTime, attendees, handleClick, blurred, rsvp_status}) {
-    const { tokenInfo, deleteToken } = useContext(TokenContext);
-
     // const currentAttendee = {
     //     id: tokenInfo.userId,
     //     email: tokenInfo.userEmail
@@ -103,7 +101,7 @@ function ExpandedEvent({ id, title, startTime, endTime, attendees, description, 
         </div>
     );
 }
-//{ tokenInfo }
+
 export default function Dashboard() {
     const [groupsEvents, setGroupsEvents] = useState([]);
     const [show, setShow] = useState(false);

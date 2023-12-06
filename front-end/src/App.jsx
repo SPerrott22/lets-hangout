@@ -16,6 +16,7 @@ import EventForm from '../pages/EventCreation';
 import { TokenContext } from '../context/TokenContext.jsx';
 import AccountCreation from '../pages/AccountCreation';
 import GroupForm from '../pages/GroupCreation';
+import Groups from '../pages/Groups';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from "react-router-dom"
 
@@ -52,6 +53,10 @@ function Header({tokenProp, tokenDeletion}) {
                   <li className="nav-item">
                     {location.pathname==="/dashboard" && (<a className="nav-link active" href="/dashboard">Dashboard</a>)}
                     {location.pathname!=="/dashboard" && (<a className="nav-link" href="/dashboard">Dashboard</a>)}
+                  </li>
+                  <li className="nav-item">
+                    {location.pathname==="/groups" && (<a className="nav-link active" href="/groups">Groups</a>)}
+                    {location.pathname!=="/groups" && (<a className="nav-link" href="/groups">Groups</a>)}
                   </li>
                   <li className="nav-item">
                     {location.pathname==="/calendar" && (<a className="nav-link active" href="/calendar">Calendar</a>)}
@@ -138,6 +143,11 @@ function App() {
               <Route path="/dashboard" element={
                 <RequireAuth>
                   <Dashboard /> 
+                </RequireAuth>
+              }/>
+              <Route path="/groups" element={
+                <RequireAuth>
+                  <Groups />
                 </RequireAuth>
               }/>
               <Route path="/calendar" element={ 
