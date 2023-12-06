@@ -3,24 +3,60 @@ import { useNavigate } from 'react-router-dom';
 import { TokenContext } from '../context/TokenContext.jsx'; // Import the context
 import './Dashboard.css';
 
-function EventBlock({ title, startTime, endTime, attendees, handleClick, blurred}) {
+function EventBlock({ title, startTime, endTime, attendees, handleClick, blurred, rsvp_status}) {
     const { tokenInfo, deleteToken } = useContext(TokenContext);
-    const rsvp_status = attendees.some((a) => a.id === tokenInfo.userId);
-    const [hasRSVPed, setRSVPed] = useState(rsvp_status);
-    let guest_string = attendees ? attendees.map(attendee => attendee.email).join(", ") : "";
+    const [guests, setGuests] = useState(attendees);
+
+    // const currentAttendee = {
+    //     id: tokenInfo.userId,
+    //     email: tokenInfo.userEmail
+    // }
+    // let newGuests = guests;
+    // let found = false;
+    // for(const a in newGuests) {
+    //     if(a.id === currentAttendee.id) {
+    //         found = true;
+    //         break;
+    //     }
+    // }
+    // if(rsvp_status && !found) {
+    //     newGuests = [...newGuests, currentAttendee];
+    // } else if(!rsvp_status && found) {
+    //     attendees.filter((a) => a.id !== tokenInfo.userId);
+    // }
+    // setGuests(newGuests);
+    let guest_string = guests ? guests.map(attendee => attendee.email).join(", ") : "";
+
+    
+
+    console.log("event block " + rsvp_status);
+    let classString = "eventBlock";
+    if(blurred) {
+        classString = classString + " blurred"
+    }
+    if(rsvp_status) {
+        classString = classString + " rsvped"
+    } else {
+        classString = classString + " notRsvped"
+    }
 
     return (
         <div>
-            {!blurred && ( <div className="eventBlock" onClick={handleClick}>
+            <div className={classString} onClick={handleClick}>
+                <div className="eventTitle">{title}</div>
+                <p>{startTime} to<br/>{endTime}</p>
+                <div className="eventGuests">{guest_string}</div>
+            </div>
+            {/* {!blurred && ( <div className="eventBlock" onClick={handleClick}>
                 <div className="eventTitle">{title}</div>
                 <p>{startTime} to<br/>{endTime}</p>
                 <div className="eventGuests">{guest_string}</div>
             </div> )}
-            {blurred && ( <div className="eventBlockBlurred" onClick={handleClick}>
+            {blurred && ( <div className="eventBlock blurred" onClick={handleClick}>
                 <div className="eventTitle">{title}</div>
                 <p>{startTime} to<br/>{endTime}</p>
                 <div className="eventGuests">{guest_string}</div>
-            </div> )}
+            </div> )} */}
         </div>
     );
 }
@@ -50,8 +86,15 @@ function ExpandedEvent({ id, title, startTime, endTime, attendees, description, 
 
     }
 
+    let classString = "expandedEvent";
+    if(rsvp_status) {
+        classString = classString + " rsvped";
+    } else {
+        classString = classString + " notRsvped";
+    }
+
     return ( 
-        <div className="expandedEvent">
+        <div className={classString}>
             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleXClick}></button>
             <h2>{title}</h2>
             <p>{startTime} to<br/>{endTime}</p>
@@ -70,6 +113,7 @@ export default function Dashboard() {
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
     const { tokenInfo, deleteToken } = useContext(TokenContext); // Use context
+    const [rsvpStatuses, setRSVPs] = useState({});
 
 
     useEffect(() => {
@@ -91,6 +135,15 @@ export default function Dashboard() {
                 if (data) {
                     console.log(data); // Debugging line
                     setGroupsEvents(data); // Data is a list of groups with their events
+                    let initialRSVPs = {};
+                    for(const g of data) {
+                        for(const e of g.events) {
+                            initialRSVPs[e.event_id] = e.attendees.some((a) => a.id === tokenInfo.userId);
+                        }
+                    }
+                    console.log(initialRSVPs)
+                    setRSVPs(initialRSVPs);
+                    console.log(rsvpStatuses);
                 }
             })
             .catch(error => console.error('Error fetching events:', error));
@@ -153,6 +206,16 @@ export default function Dashboard() {
             const errorData = await response.json();
             console.error('Error RSVPing:', errorData.message);
         }
+
+
+       // let newRSVPs = rsvpStatuses;
+        //newRSVPs[popup.id] = !newRSVPS[popup.id];
+        setRSVPs({
+            ...rsvpStatuses,
+            [popup.id]: !rsvpStatuses[popup.id]
+        });
+
+
     }
 
     const eventItems = filteredEvents.map(event => (
@@ -165,6 +228,7 @@ export default function Dashboard() {
             description={event.description}
             handleClick={() => onEventClick(event.event_id, event.title, event.start_time, event.end_time, event.attendees, event.description)}
             blurred={show}
+            rsvp_status={rsvpStatuses[event.event_id]}
         />
     ));
 
