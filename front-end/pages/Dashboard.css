@@ -102,8 +102,18 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
-.expandedEvent button {
+
+.btn-close {
     position: relative;
     left: 270px;
     top: 10px;
+}
+
+.btn-primary {
+    background-color: #4bbf73;
+}
+
+.rsvp-button {
+    position: relative;
+    margin-top: 20px;
 }

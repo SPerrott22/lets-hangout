@@ -25,7 +25,7 @@ function EventBlock({ title, startTime, endTime, attendees, handleClick, blurred
 export default function Dashboard() {
     const [groupsEvents, setGroupsEvents] = useState([]);
     const [show, setShow] = useState(false);
-    const [popup, setPopup] = useState({ title: "", startTime: "", endTime: "", guests: "", description: "" });
+    const [popup, setPopup] = useState({ id: "", title: "", startTime: "", endTime: "", guests: "", description: "" });
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
     const { tokenInfo, deleteToken } = useContext(TokenContext); // Use context
@@ -64,13 +64,13 @@ export default function Dashboard() {
         deleteToken(); 
         navigate('/login');
     }
-    function onEventClick(title, startTime, endTime, attendees, description) {
-        console.log(attendees);
+    function onEventClick(id, title, startTime, endTime, attendees, description) {
         setPopup({
+            id: id,
             title: title,
             startTime: startTime,
             endTime: endTime,
-            guests: attendees.map(attendee => attendee.email).join(", "),
+            guests: attendees,
             description: description
         });
         setShow(true);
@@ -87,6 +87,32 @@ export default function Dashboard() {
         )
     );
 
+    async function RSVP() {
+        const rsvp_status = popup.guests.some((a) => a.id === tokenInfo.userId);
+        const newAttendeesList = rsvp_status ? popup.guests.filter((a) => a.id !== tokenInfo.userId) : [...popup.guests, tokenInfo.userId];
+        console.log(JSON.stringify({
+            attendees: newAttendeesList
+        }));
+        
+        const response = await fetch(`http://localhost:4000/event/${popup.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${tokenInfo.token}`
+            },
+            body: JSON.stringify({
+                attendees: newAttendeesList
+            })
+        });
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Successfully RSVPed. Event ID:', data.id);
+        } else {
+            const errorData = await response.json();
+            console.error('Error RSVPing:', errorData.message);
+        }
+    }
+
     const eventItems = filteredEvents.map(event => (
         <EventBlock
             key={event.event_id}
@@ -95,7 +121,7 @@ export default function Dashboard() {
             endTime={event.end_time}
             attendees={event.attendees}
             description={event.description}
-            handleClick={() => onEventClick(event.title, event.start_time, event.end_time, event.attendees, event.description)}
+            handleClick={() => onEventClick(event.event_id, event.title, event.start_time, event.end_time, event.attendees, event.description)}
             blurred={show}
         />
     ));
@@ -119,8 +145,9 @@ export default function Dashboard() {
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => onXClick()}></button>
                     <h2>{popup.title}</h2>
                     <p>{popup.startTime} to<br/>{popup.endTime}</p>
-                    <p>{popup.guests}</p>
+                    <p>{popup.guests.map(attendee => attendee.email).join(", ")}</p>
                     <div className="expandedEventDescription">{popup.description}</div>
+                    <div className="rsvp-button"><button type="button" className="btn btn-primary" onClick={RSVP}>RSVP</button></div>
                 </div>
             )}
             <div className="eventArea">
