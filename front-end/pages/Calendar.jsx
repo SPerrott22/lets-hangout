@@ -53,15 +53,16 @@ const MyCalendar = () => {
     let events = [];
     groupsEvents.forEach(group => {
       group.events.forEach(event => {
+        console.log("start_time:", event.start_time);
+        console.log("end_time:", event.end_time);
         events.push({
-          start: moment(event.time).toDate(),
-          end: moment(event.time)
-                 .add(1, "days")
-                 .toDate(),
+          start: new Date(event.start_time),
+          end: new Date(event.end_time),
           title: event.title
         });
       });
     });
+    console.log("events:", events);
     return events;
   }
 
