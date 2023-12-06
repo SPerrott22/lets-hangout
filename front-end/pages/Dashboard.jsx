@@ -5,27 +5,26 @@ import './Dashboard.css';
 
 function EventBlock({ title, startTime, endTime, attendees, handleClick, blurred, rsvp_status}) {
     const { tokenInfo, deleteToken } = useContext(TokenContext);
-    const [guests, setGuests] = useState(attendees);
 
-    // const currentAttendee = {
-    //     id: tokenInfo.userId,
-    //     email: tokenInfo.userEmail
-    // }
-    // let newGuests = guests;
-    // let found = false;
-    // for(const a in newGuests) {
-    //     if(a.id === currentAttendee.id) {
-    //         found = true;
-    //         break;
-    //     }
-    // }
-    // if(rsvp_status && !found) {
-    //     newGuests = [...newGuests, currentAttendee];
-    // } else if(!rsvp_status && found) {
-    //     attendees.filter((a) => a.id !== tokenInfo.userId);
-    // }
-    // setGuests(newGuests);
-    let guest_string = guests ? guests.map(attendee => attendee.email).join(", ") : "";
+    const currentAttendee = {
+        id: tokenInfo.userId,
+        email: tokenInfo.userEmail
+    }
+    let newGuests = attendees;
+    let found = false;
+    for(const a of newGuests) {
+        if(a.id === currentAttendee.id) {
+            found = true;
+            break;
+        }
+    }
+    if(rsvp_status && !found) {
+        newGuests = [...newGuests, currentAttendee];
+    } else if(!rsvp_status && found) {
+        attendees.filter((a) => a.id !== tokenInfo.userId);
+    }
+    attendees = newGuests;
+    let guest_string = attendees ? attendees.map(attendees => attendees.email).join(", ") : "";
 
     
 
@@ -215,7 +214,7 @@ export default function Dashboard() {
             [popup.id]: !rsvpStatuses[popup.id]
         });
 
-
+        
     }
 
     const eventItems = filteredEvents.map(event => (
