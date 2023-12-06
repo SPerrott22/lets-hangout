@@ -1,6 +1,4 @@
 import { useState, useContext } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Home from '../pages/Home';
 import Dashboard from '../pages/Dashboard';
@@ -8,7 +6,6 @@ import Login from '../pages/Login';
 import RequireAuth from '../components/RequireAuth';
 import MyCalendar from '../pages/Calendar';
 import axios from "axios";
-import logo from '/vite.svg';
 import api from './api';
 // import useToken from './useToken';
 import './App.css';
