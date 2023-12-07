@@ -3,24 +3,72 @@ body {
 }
 
 .d-flex div {
-    border-radius: 10px;
-    margin-top: 20px;
+    display: flex;
+    border-radius: 20px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    gap: 10px 20px;
     margin-left: 7px;
     height: 45px;
     filter: blur(3px);
 }
 
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    min-height: 80vh; /* Make the dashboard at least as tall as the viewport */
+}
+
+
+.footer {
+    margin-top: auto; /* Pushes the footer to the bottom */
+}
+
 .d-flex input {
     border-radius: 10px;
-    margin-top: 20px;
+    margin-top: 40px;
+    margin-bottom: 40px;
     margin-left: 7px;
     height: 45px;
 }
 
+.card {
+    background-color: #fff; /* White background */
+    border-radius: 8px; /* Rounded corners for the card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* A subtle shadow to give depth */
+    margin: 0 auto; /* Center the card horizontally */
+    padding: 20px; /* Spacing inside the card */
+    max-width: 800px; /* Maximum width of the card */
+    width: 100%; /* Make the card take the full width of its container (up to max-width) */
+    margin-top: 30px; /* Space from the top */
+    margin-bottom: 30px; /* Space from the bottom */
+    overflow: hidden; /* Ensures no content spills out */
+    text-align: center; /* Center text inside the card */
+}
+
 .groupArea {
+    align-items: center; /* Align vertically */
+    justify-content: center; /* Align horizontally */
     display: flex;
     flex-wrap: wrap;
     place-items: center;
+    flex: 1; /* This will make eventArea expand to fill available space */
+    padding-bottom: 40px; /* Adjust as needed for space above the footer */
+}
+
+.no-groups-message {
+    text-align: center; /* Center the text horizontally */
+    padding: 20px; /* Add some padding around the text */
+    margin-top: 30px; /* Add space at the top */
+    font-size: 1.5rem; /* Make the font a bit larger for visibility */
+    color: #666; /* A gentle grey that is easy on the eyes */
+    background-color: #f8f8f8; /* A light background to make it stand out */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* A subtle shadow for depth */
+    max-width: 600px; /* Maximum width of the message */
+    margin-left: auto; /* Combined with margin-right: auto, centers the block */
+    margin-right: auto;
+    margin-bottom: 30px; /* Add space at the bottom to push the footer down */
 }
 
 .groupBlock {
