@@ -21,3 +21,22 @@
   margin-top: 15px;
   border: none;
 }
+.card {
+  background-color: #fff; /* White background */
+  border-radius: 8px; /* Rounded corners for the card */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* A subtle shadow to give depth */
+  margin: 0 auto; /* Center the card horizontally */
+  padding: 20px; /* Spacing inside the card */
+  max-width: 800px; /* Maximum width of the card */
+  width: 100%; /* Make the card take the full width of its container (up to max-width) */
+  margin-top: 30px; /* Space from the top */
+  margin-bottom: 30px; /* Space from the bottom */
+  overflow: hidden; /* Ensures no content spills out */
+  text-align: center; /* Center text inside the card */
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 80vh; /* Full viewport height */
+}

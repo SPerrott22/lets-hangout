@@ -1,4 +1,11 @@
 .account-form {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+    /* min-height: calc(100vh - 120px); Assuming the header and footer are 60px each */
+    padding: 20px;
+
     width: 400px;
     margin: 0 auto;
 }
