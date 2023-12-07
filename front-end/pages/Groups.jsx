@@ -88,7 +88,13 @@ export default function Groups() {
         setShow(false);
     }
 
-    const groupItems = groupUsers.map(group => (
+    console.log(searchQuery);
+    let filteredGroups = 
+        groupUsers.filter(g =>
+            g.group_name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+
+    const groupItems = filteredGroups.map(group => (
         <GroupBlock
             key={group.group_id}
             title={group.group_name}
