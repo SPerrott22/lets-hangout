@@ -1,0 +1,54 @@
+
+  /* Main container adjustments for a tighter layout */
+.container {
+    max-width: 2600px; /* Adjust the width as per your design preference */
+    margin: 0 auto; /* This will center the container */
+  }
+  
+  /* Card body adjustments for reduced padding */
+  .card-body {
+    padding: 20px; /* Reduce padding to bring content closer */
+  }
+  
+  /* Image and Icon size adjustments */
+  .img-fluid {
+    max-width: 150px; /* Reduce the size of the main image if it's too large */
+    margin-bottom: 10px; /* Reduce space below the image */
+  }
+  
+  /* Description items (icon with text) */
+  .descriptionColumn img {
+    width: 50px; /* Adjust icon size */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 5px; /* Reduce space below icons */
+  }
+  
+  .descriptionColumn p {
+    margin-bottom: 10px; /* Reduce space below text */
+  }
+  
+  /* Text adjustments for a tighter layout */
+  .card-title, .card-text {
+    margin-bottom: 10px; /* Tighten up the space between text elements */
+  }
+  
+  /* Emojis and small text */
+  .text-muted {
+    font-size: 0.8rem; /* Adjust the size of small text if needed */
+  }
+  
+  /* Adjust grid layout for the description columns */
+  #description {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Three columns for larger screens */
+    gap: 10px; /* Space between grid items */
+    justify-items: center; /* Center items horizontally */
+  }
+  
+  /* Responsive adjustments for smaller screens */
+  @media (max-width: 768px) {
+    #description {
+      grid-template-columns: 1fr; /* Single column layout for smaller screens */
+    }
+  }
+  

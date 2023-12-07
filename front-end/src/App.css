@@ -52,3 +52,37 @@
   padding: 20px 40px;
   margin: 0;
 }
+
+.App-header {
+  padding-top: 0;    /* Adjust or remove padding as needed */
+  padding-bottom: 0; /* Adjust or remove padding as needed */
+  margin-bottom: 0;  /* Adjust or remove margin as needed */
+  /* Any other styles that are making the header thick */
+}
+
+
+
+/* .navbar-brand, .nav-link {
+  padding: 0.25rem 0.5rem; /* Reduce the padding around links */
+
+/* App.css */
+
+/* Reduces the top and bottom padding on all navbar links */
+.navbar-nav .nav-link {
+  padding-top: 0.0rem;
+  padding-bottom: 0.0rem;
+}
+
+/* Adjusts the navbar brand logo size and spacing */
+.navbar-brand {
+  padding-top: 0.0rem;
+  padding-bottom: 0.0rem;
+  line-height: 0;
+}
+
+
+/* Adjust the spacing for the logout button as well */
+.navbar .btn {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
