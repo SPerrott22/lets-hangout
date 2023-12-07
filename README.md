@@ -1,5 +1,11 @@
 # Let's Hangout
-A hangout planner to bring college students together.
+A hangout planner to bring college students together. You can create events, add users to the event who can RSVP in their accounts. You can view your events in your calendar page. You can create groups as well! Do all the event scheduling your heart desires here with an open-source application you will love.
+
+## TL:DR
+- install Docker Desktop and open it
+- `git clone https://github.com/SPerrott22/lets-hangout.git`
+- `docker-compose up`
+- Open the webpage at http://localhost:5173
 
 ## How to Get Started
 Prerequisites: install git, docker, and docker-compose.
