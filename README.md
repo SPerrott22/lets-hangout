@@ -180,5 +180,6 @@ $ # further research: rebasing.
 * https://www.youtube.com/watch?v=31ieHmcTUOk&list=PL4cUxeGkcC9hxjeEtdHFNYMtCpjNBm3h7
 * https://github.com/FrancescoXX/flask-crud-live/blob/main/app.py
 * https://github.com/uclaacm/hackschool-f23/blob/main/Session-2/src/App.jsx
+* https://github.com/arecvlohe/rbc-starter
 
 &copy; 2023 by Joshua Zhu, Joshua Li, Samuel Perrott, Matthew Toutounjian, Andrew Liang.
