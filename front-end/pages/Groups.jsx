@@ -106,16 +106,6 @@ export default function Groups() {
       groupUsers.filter(g =>
           g.group_name.toLowerCase().includes(searchQuery.toLowerCase())
       )
-
-  const groupItems = filteredGroups.map(group => (
-      <GroupBlock
-          key={group.group_id}
-          title={group.group_name}
-          members={group.users}
-          handleClick={() => onGroupClick(group.group_id, group.group_name, group.users)}
-          blurred={show}
-      />
-  ));
   
   const groupItems = groupUsers.map((group) => (
     <GroupBlock
