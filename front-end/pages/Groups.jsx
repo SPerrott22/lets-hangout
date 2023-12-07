@@ -119,29 +119,40 @@ export default function Groups() {
 
   return (
     <div className="dashboard">
-      <div className="d-flex">
-        {show && <div className="form-control me-sm-2"></div>}
-        {!show && (
-          <input
-            className="form-control me-sm-2"
-            type="text"
-            placeholder="Search groups..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          ></input>
-        )}
-      </div>
-      {show && (
-        <ExpandedGroup
-          id={popup.id}
-          title={popup.title}
-          members={popup.members}
-          handleXClick={onXClick}
-          setPopup={setPopup}
-          popup={popup}
-        />
-      )}
-      <div className="groupArea">{groupItems}</div>
+        <div className="card">
+            <div className="d-flex">
+                {show && <div className="form-control me-sm-2"></div>}
+                {!show && (
+                <input
+                    className="form-control me-sm-2"
+                    type="text"
+                    placeholder="Search groups..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                ></input>
+                )}
+            </div>
+            {show && (
+                <ExpandedGroup
+                id={popup.id}
+                title={popup.title}
+                members={popup.members}
+                handleXClick={onXClick}
+                setPopup={setPopup}
+                popup={popup}
+                />
+            )}
+            <div className="groupArea">
+                {groupItems.length > 0 ? (
+                    groupItems
+                ) : (
+                    <div className="no-groups-message">
+                    {/* You can style .no-events-message as needed */}
+                    <span> No groups to show {"\u{1F61E}"}</span>
+                    </div>
+                )}
+            </div>
+        </div>
     </div>
   );
 }
