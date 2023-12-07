@@ -471,8 +471,9 @@ def create_event():
     current_user_email = get_jwt_identity()  # Assuming request.user is a User instance
     current_user = User.query.filter_by(email=current_user_email).first()
 
-    if current_user not in group.admin_ids:
-        return jsonify({'message': 'Only admins can create events for this group'}), 403
+# deprecated this feature due to time constraints. Admin feature is not implemented
+    # if current_user not in group.admin_ids:
+    #     return jsonify({'message': 'Only admins can create events for this group'}), 403
 
     new_event = Event(group_id=group_id, title=title, description=description,
                       start_time=start_time, end_time=end_time)
