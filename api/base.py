@@ -276,12 +276,14 @@ def create_group():
     new_group = Group(name=name)
     db.session.add(new_group)  # Add the group to the session first
 
-    new_group.admin_ids.append(creator)  # Add creator as admin
+    # We've switched to just making everyone admin
+    # new_group.admin_ids.append(creator)  # Add creator as admin
 
     invalid_user_ids = []
     for user_id in user_ids:
         if user := User.query.get(user_id):
             new_group.users.append(user)
+            new_group.admin_ids.append(user)
         else:
             invalid_user_ids.append(str(user_id))
 

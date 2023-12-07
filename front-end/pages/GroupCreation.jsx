@@ -83,7 +83,9 @@ const GroupForm = () => {
     handleInputChange("");
   };
 
-  const handleCreateGroup = async () => {
+  const handleCreateGroup = async (e) => {
+    e.preventDefault();
+    
     try {
       // Extract user IDs from selectedUsers
       const userIds = selectedUsers.map((user) => user.value);
